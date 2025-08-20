@@ -1,55 +1,54 @@
 <?php
 
-
 namespace App\Http\Controllers;
+
 use App\Models\Task;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Customer;
 use App\Models\CustomerRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class CallCenterController extends Controller
 {
     public function index()
-{
-    $requests = CustomerRequest::with('customer')->get();
+    {
+        $requests = CustomerRequest::with('customer')->get();
 
-    // Get tasks assigned to the logged-in user
-    $tasks = Task::where('assigned_to', Auth::id())
-                 ->latest()
-                 ->take(5) // optional: limit to 5 latest tasks
-                 ->get();
+        // Get tasks assigned to the logged-in user
+        $tasks = Task::where('assigned_to', Auth::id())
+                     ->latest()
+                     ->take(5)
+                     ->get();
 
-    return view('callcenter.index', compact('requests', 'tasks'));
-}
+        return view('callcenter.index', compact('requests', 'tasks'));
+    }
 
-public function myTasks()
-{
-    $userId = Auth::id();
-    $tasks = Task::where('assigned_to', $userId)->latest()->get();
+    public function myTasks()
+    {
+        $userId = Auth::id();
+        $tasks = Task::where('assigned_to', $userId)->latest()->get();
 
-    $tasksCount = [
-        'total' => $tasks->count(),
-        'pending' => $tasks->where('status', 'pending')->count(),
-        'in_progress' => $tasks->where('status', 'in_progress')->count(),
-        'completed' => $tasks->where('status', 'completed')->count(),
-        'canceled' => $tasks->where('status', 'canceled')->count(),
-    ];
+        $tasksCount = [
+            'total' => $tasks->count(),
+            'pending' => $tasks->where('status', 'pending')->count(),
+            'in_progress' => $tasks->where('status', 'in_progress')->count(),
+            'completed' => $tasks->where('status', 'completed')->count(),
+            'canceled' => $tasks->where('status', 'canceled')->count(),
+        ];
 
-    return view('callcenter.my-tasks', compact('tasks', 'tasksCount'));
-}
+        return view('callcenter.my-tasks', compact('tasks', 'tasksCount'));
+    }
 
+    public function updateTaskStatus(Request $request, Task $task)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,in_progress,completed,canceled',
+        ]);
 
-public function updateTaskStatus(Request $request, Task $task)
-{
-    $request->validate([
-        'status' => 'required|in:pending,in_progress,completed,canceled',
-    ]);
+        $task->update(['status' => $request->status]);
 
-    $task->update(['status' => $request->status]);
-
-    return response()->json(['success' => true]);
-}
+        return response()->json(['success' => true]);
+    }
 
     public function create()
     {
@@ -70,7 +69,6 @@ public function updateTaskStatus(Request $request, Task $task)
             'source' => 'required|in:instagram,tiktok,facebook,linkedin,walk_in_customer,twitter,snapchat'
         ]);
 
-        // Check if customer exists
         $customer = Customer::firstOrCreate(
             ['phone' => $validated['phone']],
             [
@@ -81,7 +79,6 @@ public function updateTaskStatus(Request $request, Task $task)
             ]
         );
 
-        // Save request
         CustomerRequest::create([
             'customer_id' => $customer->id,
             'need' => $validated['need'],
@@ -92,87 +89,80 @@ public function updateTaskStatus(Request $request, Task $task)
 
         return redirect()->route('callcenter.index')->with('success', 'Customer request saved!');
     }
+
     public function updateStatus(Request $request, $id)
-{
-    $request->validate([
-        'status' => 'required|in:pending,processing,completed,canceled'
-    ]);
+    {
+        $request->validate([
+            'status' => 'required|in:pending,processing,completed,canceled'
+        ]);
 
-    $customerRequest = CustomerRequest::findOrFail($id);
-    $customerRequest->status = $request->status;
-    $customerRequest->save();
+        $customerRequest = CustomerRequest::findOrFail($id);
+        $customerRequest->status = $request->status;
+        $customerRequest->save();
 
-    return response()->json(['success' => true]);
-}
-public function history($id)
-{
-    // Get the customer
-    $customer = Customer::findOrFail($id);
+        return response()->json(['success' => true]);
+    }
 
-    // Fetch all requests where customer phone matches
-    $requests = CustomerRequest::whereHas('customer', function($q) use ($customer) {
-        $q->where('phone', $customer->phone);
-    })->with('customer')->latest()->get();
+    public function history($id)
+    {
+        $customer = Customer::findOrFail($id);
 
-    return view('callcenter.history', compact('customer', 'requests'));
-}
+        $requests = CustomerRequest::whereHas('customer', function($q) use ($customer) {
+            $q->where('phone', $customer->phone);
+        })->with('customer')->latest()->get();
 
+        return view('callcenter.history', compact('customer', 'requests'));
+    }
 
+    public function search(Request $request)
+    {
+        $term = $request->get('term', '');
 
-     public function search(Request $request)
-{
-    $term = $request->get('term', '');
+        $customers = Customer::where('name', 'LIKE', "%$term%")
+            ->orWhere('phone', 'LIKE', "%$term%")
+            ->limit(10)
+            ->get(['id', 'name', 'phone', 'email', 'location', 'occupation']);
 
-    $customers = Customer::where('name', 'LIKE', "%$term%")
-        ->orWhere('phone', 'LIKE', "%$term%")
-        ->limit(10)
-        ->get(['id', 'name', 'phone', 'email', 'location', 'occupation']);
+        $customers->each(function($customer) {
+            $customer->latest_source = $customer->requests()->latest()->value('source');
+        });
 
-    // Attach latest source from requests
-    $customers->each(function($customer) {
-        $customer->latest_source = $customer->requests()->latest()->value('source');
-    });
-
-    return response()->json($customers);
-}
-
+        return response()->json($customers);
+    }
 
     public function filterRequests(Request $request)
-{
-    $term = $request->get('term', '');
-    $status = $request->get('status', '');
+    {
+        $term = $request->get('term', '');
+        $status = $request->get('status', '');
 
-    $requests = CustomerRequest::with('customer')
-        ->when($term, function($q) use ($term) {
-            $q->whereHas('customer', function($q2) use ($term) {
-                $q2->where('name', 'like', "%{$term}%")
-                   ->orWhere('phone', 'like', "%{$term}%")
-                   ->orWhere('source', 'like', "%{$term}%");
-            });
-        })
-        ->when($status, function($q) use ($status) {
-            $q->where('status', $status);
-        })
-        ->latest()
-        ->take(50)
-        ->get();
+        $requests = CustomerRequest::with('customer')
+            ->when($term, function($q) use ($term) {
+                $q->whereHas('customer', function($q2) use ($term) {
+                    $q2->where('name', 'like', "%{$term}%")
+                       ->orWhere('phone', 'like', "%{$term}%")
+                       ->orWhere('source', 'like', "%{$term}%");
+                });
+            })
+            ->when($status, function($q) use ($status) {
+                $q->where('status', $status);
+            })
+            ->latest()
+            ->take(50)
+            ->get();
 
-    return response()->json($requests);
+        return response()->json($requests);
+    }
+
+    public function updateComment(Request $request, $id)
+    {
+        $request->validate([
+            'comment' => 'nullable|string'
+        ]);
+
+        $customerRequest = CustomerRequest::findOrFail($id);
+        $customerRequest->comment = $request->comment;
+        $customerRequest->save();
+
+        return response()->json(['success' => true, 'comment' => $customerRequest->comment]);
+    }
 }
-public function updateComment(Request $request, $id)
-{
-    $request->validate([
-        'comment' => 'nullable|string'
-    ]);
-
-    $customerRequest = CustomerRequest::findOrFail($id);
-    $customerRequest->comment = $request->comment;
-    $customerRequest->save();
-
-    return response()->json(['success' => true, 'comment' => $customerRequest->comment]);
-}
-
-
-
-}
-
