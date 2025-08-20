@@ -121,7 +121,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [CallCenterController::class, 'index'])->name('callcenter.index');
         Route::get('/customers/{id}/history', [CallCenterController::class, 'history'])->name('customers.history');
         Route::post('/requests/{id}/update-comment', [CallCenterController::class, 'updateComment'])->name('requests.updateComment');
-
+        Route::get('/callcenter/my-tasks', [CallCenterController::class, 'myTasks'])->name('callcenter.my-tasks');
+Route::post('/callcenter/tasks/{task}/status', [CallCenterController::class, 'updateTaskStatus'])
+     ->name('callcenter.tasks.update-status');
 
     });
 

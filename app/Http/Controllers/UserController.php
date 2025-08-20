@@ -9,18 +9,21 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    // Display all users
     public function index()
     {
         $users = User::with('department')->get();
         return view('users.index', compact('users'));
     }
 
+    // Show form to create a new user
     public function create()
     {
         $departments = Department::all();
         return view('users.create', compact('departments'));
     }
 
+    // Store a new user
     public function store(Request $request)
     {
         $request->validate([
@@ -40,13 +43,14 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Employee created successfully.');
     }
 
+    // Show form to edit an existing user
     public function edit(User $user)
-{
-    $departments = Department::all();
-    return view('users.edit', compact('user', 'departments'));
-}
+    {
+        $departments = Department::all();
+        return view('users.edit', compact('user', 'departments'));
+    }
 
-
+    // Update an existing user
     public function update(Request $request, User $user)
     {
         $request->validate([
@@ -73,30 +77,34 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Employee updated successfully.');
     }
 
+    // Delete a user
     public function destroy(User $user)
     {
         $user->delete();
         return redirect()->route('users.index')->with('success', 'Employee deleted successfully.');
     }
+
+    // Show dashboard / employee-specific data
     public function show()
-{
-    $user = auth()->user();
+    {
+        $user = auth()->user();
 
-    if ($user->isCEO()) {
-        // Get counts for CEO dashboard
-        $departmentsCount = Department::count();
-        $usersCount = User::count();
-        $tasksCount = Task::count();
-        $leaveRequestsCount = LeaveRequest::count();
+        if ($user->isCEO()) {
+            // CEO dashboard data
+            $departmentsCount = Department::count();
+            $usersCount = User::count();
+            $tasksCount = Task::count();
+            $leaveRequestsCount = LeaveRequest::count();
 
-        return view('dashboard_ceo', compact('departmentsCount', 'usersCount', 'tasksCount', 'leaveRequestsCount'));
-    } else {
-        // Get employee-specific data
-        $tasks = $user->assignedTasks()->latest()->take(5)->get();
-        $notifications = $user->notifications()->latest()->take(5)->get();
+            return view('dashboard_ceo', compact(
+                'departmentsCount', 'usersCount', 'tasksCount', 'leaveRequestsCount'
+            ));
+        } else {
+            // Employee dashboard data
+            $tasks = $user->assignedTasks()->latest()->take(5)->get();
+            $notifications = $user->notifications()->latest()->take(5)->get();
 
-        return view('dashboard_employee', compact('tasks', 'notifications'));
+            return view('dashboard_employee', compact('tasks', 'notifications'));
+        }
     }
-}
-
 }

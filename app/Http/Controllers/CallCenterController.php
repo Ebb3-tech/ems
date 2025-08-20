@@ -2,7 +2,8 @@
 
 
 namespace App\Http\Controllers;
-
+use App\Models\Task;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Customer;
 use App\Models\CustomerRequest;
 use Illuminate\Http\Request;
@@ -10,10 +11,45 @@ use Illuminate\Http\Request;
 class CallCenterController extends Controller
 {
     public function index()
-    {
-        $requests = CustomerRequest::with('customer')->latest()->get();
-        return view('callcenter.index', compact('requests'));
-    }
+{
+    $requests = CustomerRequest::with('customer')->get();
+
+    // Get tasks assigned to the logged-in user
+    $tasks = Task::where('assigned_to', Auth::id())
+                 ->latest()
+                 ->take(5) // optional: limit to 5 latest tasks
+                 ->get();
+
+    return view('callcenter.index', compact('requests', 'tasks'));
+}
+
+public function myTasks()
+{
+    $userId = Auth::id();
+    $tasks = Task::where('assigned_to', $userId)->latest()->get();
+
+    $tasksCount = [
+        'total' => $tasks->count(),
+        'pending' => $tasks->where('status', 'pending')->count(),
+        'in_progress' => $tasks->where('status', 'in_progress')->count(),
+        'completed' => $tasks->where('status', 'completed')->count(),
+        'canceled' => $tasks->where('status', 'canceled')->count(),
+    ];
+
+    return view('callcenter.my-tasks', compact('tasks', 'tasksCount'));
+}
+
+
+public function updateTaskStatus(Request $request, Task $task)
+{
+    $request->validate([
+        'status' => 'required|in:pending,in_progress,completed,canceled',
+    ]);
+
+    $task->update(['status' => $request->status]);
+
+    return response()->json(['success' => true]);
+}
 
     public function create()
     {

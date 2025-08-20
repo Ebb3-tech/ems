@@ -54,6 +54,17 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-3">
+    <a href="{{ route('callcenter.my-tasks') }}" class="text-decoration-none">
+        <div class="card text-white bg-dark h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">My Tasks</h5>
+                <p class="card-text fs-2" id="total-tasks">{{ $tasks->count() }}</p>
+            </div>
+        </div>
+    </a>
+</div>
+
     </div>
 
     {{-- Quick Actions --}}
