@@ -49,7 +49,7 @@
                 <option value="2" {{ old('role', $user->role ?? '') == 2 ? 'selected' : '' }}>Call Center</option>
                 <option value="3" {{ old('role', $user->role ?? '') == 3 ? 'selected' : '' }}>Marketing</option>
                 <option value="4" {{ old('role', $user->role ?? '') == 4 ? 'selected' : '' }}>Shop</option>
-                <option value="5" {{ old('role', $user->role ?? '') == 5 ? 'selected' : '' }}>CEO</option>
+                <option value="5" {{ old('role', $user->role ?? '') == 5 ? 'selected' : '' }}>Manager</option>
             </select>
         </div>
 

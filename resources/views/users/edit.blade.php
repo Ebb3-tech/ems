@@ -47,7 +47,6 @@
                 id="department_id" 
                 name="department_id" 
                 class="form-select @error('department_id') is-invalid @enderror"
-                required
             >
                 <option value="">Select Department</option>
                 @foreach($departments as $department)
@@ -62,7 +61,22 @@
             @enderror
         </div>
 
-        {{-- Role (if you have roles, adjust as needed) --}}
+        {{-- Position --}}
+        <div class="mb-3">
+            <label for="position" class="form-label">Position</label>
+            <input 
+                type="text" 
+                id="position" 
+                name="position" 
+                value="{{ old('position', $user->position) }}" 
+                class="form-control @error('position') is-invalid @enderror"
+            >
+            @error('position')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        {{-- Role --}}
         <div class="mb-3">
             <label for="role" class="form-label">Role</label>
             <select 
@@ -76,8 +90,7 @@
                 <option value="2" {{ old('role', $user->role) == 2 ? 'selected' : '' }}>Call center</option>
                 <option value="3" {{ old('role', $user->role) == 3 ? 'selected' : '' }}>Marketing</option>
                 <option value="4" {{ old('role', $user->role) == 4 ? 'selected' : '' }}>Shop</option>
-                <option value="5" {{ old('role', $user->role) == 5 ? 'selected' : '' }}>CEO</option>
-                <!-- Adjust roles based on your system -->
+                <option value="5" {{ old('role', $user->role) == 5 ? 'selected' : '' }}>Manager</option>
             </select>
             @error('role')
                 <div class="invalid-feedback">{{ $message }}</div>
