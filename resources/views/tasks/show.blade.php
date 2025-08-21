@@ -26,7 +26,6 @@
         </div>
     </div>
 
-    <a href="{{ route('tasks.index') }}" class="btn btn-secondary">Back to Tasks</a>
     <a href="{{ route('tasks.edit', $task) }}" class="btn btn-primary">Update Task</a>
 </div>
 @endsection

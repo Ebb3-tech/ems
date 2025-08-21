@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Notifications\UserCreatedOrUpdated;
 
 class UserController extends Controller
 {
@@ -23,7 +24,7 @@ class UserController extends Controller
         return view('users.create', compact('departments'));
     }
 
-    // Store a new user
+    // Store a new user and send email notification
     public function store(Request $request)
     {
         $request->validate([
@@ -35,12 +36,19 @@ class UserController extends Controller
             'password' => 'required|string|min:6|confirmed',
         ]);
 
+        // Keep plain password for email
+        $plainPassword = $request->password;
+
         $userData = $request->only('name', 'email', 'department_id', 'position', 'role');
-        $userData['password'] = Hash::make($request->password);
+        $userData['password'] = Hash::make($plainPassword);
 
-        User::create($userData);
+        $user = User::create($userData);
 
-        return redirect()->route('users.index')->with('success', 'Employee created successfully.');
+        // Send email notification
+        $user->notify(new UserCreatedOrUpdated('created', $plainPassword));
+
+        return redirect()->route('users.index')
+            ->with('success', 'Employee created successfully and notified via email.');
     }
 
     // Show form to edit an existing user
@@ -50,7 +58,7 @@ class UserController extends Controller
         return view('users.edit', compact('user', 'departments'));
     }
 
-    // Update an existing user
+    // Update an existing user and send email notification
     public function update(Request $request, User $user)
     {
         $request->validate([
@@ -68,13 +76,19 @@ class UserController extends Controller
         $user->position = $request->position;
         $user->role = $request->role;
 
+        $passwordChanged = false;
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
+            $passwordChanged = true;
         }
 
         $user->save();
 
-        return redirect()->route('users.index')->with('success', 'Employee updated successfully.');
+        // Send email notification
+        $user->notify(new UserCreatedOrUpdated('updated', $passwordChanged ? $request->password : null));
+
+        return redirect()->route('users.index')
+            ->with('success', 'Employee updated successfully and notified via email.');
     }
 
     // Delete a user
@@ -82,29 +96,5 @@ class UserController extends Controller
     {
         $user->delete();
         return redirect()->route('users.index')->with('success', 'Employee deleted successfully.');
-    }
-
-    // Show dashboard / employee-specific data
-    public function show()
-    {
-        $user = auth()->user();
-
-        if ($user->isCEO()) {
-            // CEO dashboard data
-            $departmentsCount = Department::count();
-            $usersCount = User::count();
-            $tasksCount = Task::count();
-            $leaveRequestsCount = LeaveRequest::count();
-
-            return view('dashboard_ceo', compact(
-                'departmentsCount', 'usersCount', 'tasksCount', 'leaveRequestsCount'
-            ));
-        } else {
-            // Employee dashboard data
-            $tasks = $user->assignedTasks()->latest()->take(5)->get();
-            $notifications = $user->notifications()->latest()->take(5)->get();
-
-            return view('dashboard_employee', compact('tasks', 'notifications'));
-        }
     }
 }
