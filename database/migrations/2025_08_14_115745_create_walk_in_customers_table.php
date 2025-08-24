@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('walk_in_customers', function (Blueprint $table) {
-    $table->id();
-    $table->string('name');
-    $table->string('phone')->nullable();
-    $table->foreignId('added_by')->constrained('users'); 
-    $table->timestamps();
-});
-
+            $table->id();
+            $table->string('name');
+            $table->string('phone')->nullable();
+            $table->string('source')->nullable();
+            $table->foreignId('added_by')->constrained('users')->onDelete('cascade');
+            $table->timestamps();
+        });
     }
 
     /**

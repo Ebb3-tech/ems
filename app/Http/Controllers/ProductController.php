@@ -2,63 +2,72 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $products = Product::with('vendor')->latest()->get();
+        return view('shop.products.index', compact('products'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $vendors = Vendor::all(); // list of vendors to select
+        return view('shop.products.create', compact('vendors'));
+    }
+    public function show(Product $product)
+    {
+        return view('shop.products.show', compact('product'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function edit($id)
+{
+    $product = Product::findOrFail($id);
+    return view('shop.products.edit', compact('product'));
+}
+
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'price' => 'required|numeric',
+        // add other fields
+    ]);
+
+    $product = Product::findOrFail($id);
+    $product->update($request->all());
+
+    return redirect()->route('shop.products.index')
+        ->with('success', 'Product updated successfully.');
+}
+public function destroy($id)
+{
+    $product = Product::findOrFail($id);
+    $product->delete();
+    return redirect()->route('shop.products.index')
+        ->with('success', 'Product deleted successfully.');
+}
+
     public function store(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'vendor_id' => 'required|exists:vendors,id',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'nullable|numeric|min:0',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        Product::create($request->only([
+            'name', 
+            'price', 
+            'vendor_id', 
+            'description', 
+        ]));
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('shop.products.index')->with('success', 'Product created successfully.');
     }
 }

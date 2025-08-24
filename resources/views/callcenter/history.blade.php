@@ -13,53 +13,58 @@
         </div>
     </div>
 
-    <h4 class="mt-4">Requests Histories (Phone: {{ $customer->phone }})</h4>
-    <table class="table table-bordered table-hover">
-        <thead class="table-light">
-            <tr>
-                <th>Date</th>
-                <th>Need</th>
-                <th>Source</th>
-                <th>Status</th>
-                <th>Comment</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($requests as $req)
-            <tr>
-                <td>{{ $req->created_at->format('Y-m-d H:i') }}</td>
-                <td>{{ $req->need }}</td>
-                <td>
-                    @if($req->source == 'walk_in_customer')
-                        Walk-in Customer
-                    @else
-                        {{ ucfirst($req->source) }}
-                    @endif
-                </td>
-                <td>
-                    <span class="badge 
-                        {{ $req->status=='pending'?'bg-warning':
-                           ($req->status=='processing'?'bg-secondary':
-                           ($req->status=='completed'?'bg-info':'bg-danger')) }}">
-                        {{ ucfirst($req->status) }}
-                    </span>
-                </td>
-                <td>
-    <input type="text" 
-           class="form-control form-control-sm comment-input" 
-           data-id="{{ $req->id }}" 
-           value="{{ $req->comment }}">
-</td>
-
-            </tr>
-            @empty
-            <tr>
-                <td colspan="5" class="text-center">No requests found</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
+    <h4 class="mt-4">Customer History (Phone: {{ $customer->phone }})</h4>
+    
+    <div class="card">
+        <div class="card-body chat-history">
+            @if($requests->isEmpty())
+                <p class="text-center">No requests found</p>
+            @else
+                @foreach($requests as $req)
+                    <div class="history-item mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">{{ $req->created_at->format('Y-m-d H:i') }}</span>
+                            <span class="badge 
+                                {{ $req->status=='pending'?'bg-warning':
+                                   ($req->status=='processing'?'bg-secondary':
+                                   ($req->status=='completed'?'bg-info':'bg-danger')) }}">
+                                {{ ucfirst($req->status) }}
+                            </span>
+                        </div>
+                        <div class="history-content mt-1 p-3 border rounded">
+                            <p class="mb-1"><strong>Need:</strong> {{ $req->need }}</p>
+                            <p class="mb-1"><strong>Source:</strong> 
+                                @if($req->source == 'walk_in_customer')
+                                    Walk-in Customer
+                                @else
+                                    {{ ucfirst($req->source) }}
+                                @endif
+                            </p>
+                            <div class="mt-2">
+                                <label class="form-label small">Comment:</label>
+                                <input type="text" 
+                                       class="form-control form-control-sm comment-input" 
+                                       data-id="{{ $req->id }}" 
+                                       value="{{ $req->comment }}">
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
+        </div>
+    </div>
 </div>
+
+<style>
+.chat-history {
+    max-height: 600px;
+    overflow-y: auto;
+}
+.history-content {
+    background-color: #f8f9fa;
+}
+</style>
+
 <script>
 document.querySelectorAll('.comment-input').forEach(input => {
     input.addEventListener('change', function() {
@@ -92,6 +97,4 @@ document.querySelectorAll('.comment-input').forEach(input => {
     });
 });
 </script>
-
-
 @endsection

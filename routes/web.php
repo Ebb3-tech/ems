@@ -2,16 +2,29 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
-    DepartmentController,UserController,TaskController,LeaveRequestController,DailyReportController,AttendanceController,NotificationController,CallCenterController,
+    DepartmentController,
+    UserController,
+    TaskController,
+    LeaveRequestController,
+    DailyReportController,
+    AttendanceController,
+    NotificationController,
+    CallCenterController,
     CeoController,
     EmployeeController,
     VendorController,
     ProductController,
     WalkInCustomerController,
-    ShopController
+    ShopController,
+    ShopCustomerController
 };
-
-use App\Http\Controllers\Auth\{LoginController, RegisterController};
+use App\Http\Controllers\Auth\{
+    LoginController,
+    RegisterController,
+    PasswordController,
+    PasswordResetLinkController,
+    NewPasswordController
+};
 use App\Models\{
     Department,
     User,
@@ -24,7 +37,7 @@ use App\Models\{
     Product,
     WalkInCustomer
 };
-
+use Illuminate\Support\Facades\Auth;
 
 // Helper function for role-based dashboard redirect
 if (!function_exists('redirectToAllowedDashboard')) {
@@ -39,11 +52,37 @@ if (!function_exists('redirectToAllowedDashboard')) {
     }
 }
 
-// Public routes
+// Auth routes
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login']);
 Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [RegisterController::class, 'register']);
+Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
+Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
+Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
+Route::post('reset-password', [NewPasswordController::class, 'store'])->name('password.update');
+Route::get('/home', function () {
+    $user = Auth::user();
+
+    if (!$user) {
+        return redirect()->route('login'); // guest -> login
+    }
+
+    // Reuse redirect logic
+    if ((string) $user->role === '5') {
+        return redirect()->route('dashboard'); // CEO dashboard
+    } elseif ((string) $user->role === '1') {
+        return redirect()->route('employee.dashboard'); // Employee dashboard
+    } elseif ((string) $user->role === '2') {
+        return redirect()->route('callcenter.index'); // Call center dashboard
+    } elseif ((string) $user->role === '3') {
+        return redirect()->route('marketing.dashboard'); // Marketing dashboard
+    } elseif ((string) $user->role === '4') {
+        return redirect()->route('shop.dashboard'); // Shop dashboard
+    }
+
+    return redirect()->route('employee.dashboard'); // default fallback
+})->name('home');
 
 // Protected routes
 Route::middleware('auth')->group(function () {
@@ -61,6 +100,18 @@ Route::middleware('auth')->group(function () {
     Route::resource('leave-requests', LeaveRequestController::class);
     Route::resource('daily-reports', DailyReportController::class);
     Route::resource('attendance', AttendanceController::class);
+
+    // Profile
+    Route::get('/profile/change-password', function() {
+        return view('profile.change-password');
+    })->name('profile.edit-password');
+
+    Route::post('/profile/change-password', [PasswordController::class, 'update'])->name('profile.update-password');
+
+    Route::get('/profile', function () {
+        $user = auth()->user();
+        return view('profile.show', compact('user'));
+    })->name('profile.show');
 
     // Dashboards
     Route::get('/dashboard', function () {
@@ -122,13 +173,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/customers/{id}/history', [CallCenterController::class, 'history'])->name('customers.history');
         Route::post('/requests/{id}/update-comment', [CallCenterController::class, 'updateComment'])->name('requests.updateComment');
         Route::get('/callcenter/my-tasks', [CallCenterController::class, 'myTasks'])->name('callcenter.my-tasks');
-Route::post('/callcenter/tasks/{task}/status', [CallCenterController::class, 'updateTaskStatus'])
-     ->name('callcenter.tasks.update-status');
-
+        Route::post('/callcenter/tasks/{task}/status', [CallCenterController::class, 'updateTaskStatus'])
+            ->name('callcenter.tasks.update-status');
     });
 
     // Shop Routes
-    Route::prefix('shop')->group(function() {
+    Route::prefix('shop')->name('shop.')->group(function() {
 
         Route::get('/dashboard', function() {
             $user = auth()->user();
@@ -139,11 +189,24 @@ Route::post('/callcenter/tasks/{task}/status', [CallCenterController::class, 'up
                 'productsCount' => Product::count(),
                 'walkInCustomersCount' => WalkInCustomer::count(),
             ]);
-        })->name('shop.dashboard');
+        })->name('dashboard');
 
         Route::resource('vendors', VendorController::class);
         Route::resource('products', ProductController::class);
-        Route::resource('walk-in-customers', WalkInCustomerController::class);
+
+        Route::get('customers/create', [ShopCustomerController::class, 'create'])->name('customers.create');
+        Route::post('customers', [ShopCustomerController::class, 'store'])->name('customers.store');
+        Route::get('customers/{customer}', [ShopCustomerController::class, 'show'])->name('customers.show');
+         Route::resource('walk-in-customers', WalkInCustomerController::class)->names([
+        'index'   => 'walk-in-customers.index',
+        'create'  => 'walk-in-customers.create',
+        'store'   => 'walk-in-customers.store',
+        'show'    => 'walk-in-customers.show',
+        'edit'    => 'walk-in-customers.edit',
+        'update'  => 'walk-in-customers.update',
+        'destroy' => 'walk-in-customers.destroy',
+    ]);
+
     });
 });
 
@@ -151,4 +214,3 @@ Route::post('/callcenter/tasks/{task}/status', [CallCenterController::class, 'up
 Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
 });
- 

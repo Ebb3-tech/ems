@@ -63,47 +63,46 @@ class DailyReportController extends Controller
     return view('daily-reports.show', ['report' => $dailyReport]);
 }
 
-    public function edit(DailyReport $dailyReport)
-    {
+   public function edit(DailyReport $dailyReport)
+{
+    // ✅ Anyone can edit
+    return view('daily-reports.edit', ['report' => $dailyReport]);
+}
 
-        if ($dailyReport->user_id !== Auth::id()) {
-            abort(403);
-        }
+public function update(Request $request, DailyReport $dailyReport)
+{
+    // ✅ Anyone can update
+    $request->validate([
+        'report_date' => 'required|date',
+        'content' => 'required|string',
+        'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
+    ]);
 
-        return view('daily-reports.edit', ['report' => $dailyReport]);
+    $dailyReport->update([
+        'report_date' => $request->report_date,
+        'content' => $request->content,
+        'image' => $request->hasFile('image')
+            ? $request->file('image')->store('daily_reports', 'public')
+            : $dailyReport->image,
+    ]);
+
+    return redirect()->route('daily-reports.index')
+        ->with('success', 'Daily report updated successfully.');
+}
+
+public function destroy(DailyReport $dailyReport)
+{
+    $user = Auth::user();
+
+    // ✅ Only CEO (role=5) can delete
+    if ($user->role != 5) {
+        abort(403, 'Only the CEO can delete reports.');
     }
 
-    public function update(Request $request, DailyReport $dailyReport)
-    {
-        if ($dailyReport->user_id !== Auth::id()) {
-            abort(403);
-        }
+    $dailyReport->delete();
 
-        $request->validate([
-            'report_date' => 'required|date',
-            'content' => 'required|string',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
-        ]);
+    return redirect()->route('daily-reports.index')
+        ->with('success', 'Daily report deleted successfully.');
+}
 
-        $dailyReport->update([
-            'report_date' => $request->report_date,
-            'content' => $request->content,
-            'image' => $request->hasFile('image') ? $request->file('image')->store('daily_reports', 'public') : $dailyReport->image,
-        ]);
-
-        return redirect()->route('daily-reports.index')->with('success', 'Daily report updated successfully.');
-    }
-
-    // Delete a daily report
-    public function destroy(DailyReport $dailyReport)
-    {
-        // Optional: Check if the current user is owner or admin
-        if ($dailyReport->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $dailyReport->delete();
-
-        return redirect()->route('daily-reports.index')->with('success', 'Daily report deleted successfully.');
-    }
 }

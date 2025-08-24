@@ -6,7 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    public function vendor() {
-    return $this->belongsTo(Vendor::class);
-}
+    protected $fillable = [
+        'vendor_id',
+        'name',
+        'description',
+        'price',
+    ];
+
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
+    }
 }

@@ -131,27 +131,42 @@ class CallCenterController extends Controller
     }
 
     public function filterRequests(Request $request)
-    {
-        $term = $request->get('term', '');
-        $status = $request->get('status', '');
+{
+    $name = $request->get('name', '');
+    $phone = $request->get('phone', '');
+    $source = $request->get('source', '');
+    $status = $request->get('status', '');
 
-        $requests = CustomerRequest::with('customer')
-            ->when($term, function($q) use ($term) {
-                $q->whereHas('customer', function($q2) use ($term) {
-                    $q2->where('name', 'like', "%{$term}%")
-                       ->orWhere('phone', 'like', "%{$term}%")
-                       ->orWhere('source', 'like', "%{$term}%");
-                });
-            })
-            ->when($status, function($q) use ($status) {
-                $q->where('status', $status);
-            })
-            ->latest()
-            ->take(50)
-            ->get();
-
-        return response()->json($requests);
+    $query = CustomerRequest::with('customer');
+    
+    // Filter by customer name
+    if (!empty($name)) {
+        $query->whereHas('customer', function($q) use ($name) {
+            $q->where('name', 'like', "%{$name}%");
+        });
     }
+    
+    // Filter by customer phone
+    if (!empty($phone)) {
+        $query->whereHas('customer', function($q) use ($phone) {
+            $q->where('phone', 'like', "%{$phone}%");
+        });
+    }
+    
+    // Filter by source
+    if (!empty($source)) {
+        $query->where('source', $source);
+    }
+    
+    // Filter by status
+    if (!empty($status)) {
+        $query->where('status', $status);
+    }
+    
+    $requests = $query->latest()->take(50)->get();
+    
+    return response()->json($requests);
+}
 
     public function updateComment(Request $request, $id)
     {
