@@ -81,12 +81,12 @@
                     {{-- Assign Marks (CEO only) --}}
                     @if(auth()->user()->role == 5)
                     <div class="mb-3">
-                        <h6 class="fw-bold mb-2"><i class="fas fa-star text-primary me-1"></i> Assign Marks</h6>
+                        <h6 class="fw-bold mb-2"><i class="fas fa-star text-primary me-1"></i> Assigned Marks</h6>
                         <form action="{{ route('daily-reports.assignMarks', $report->id) }}" method="POST" class="d-flex gap-2">
                             @csrf
                             <input type="number" name="marks" min="0" max="100" class="form-control" 
                                    placeholder="Enter marks" value="{{ $report->marks ?? '' }}" required>
-                            <button type="submit" class="btn btn-success">Assign</button>
+                            <button type="submit" class="btn btn-success">Assign marks</button>
                         </form>
                     </div>
                     @endif
