@@ -28,7 +28,8 @@
     
     .chat-container {
         display: flex;
-        height: 80vh;
+        flex-direction: column;
+        height: calc(100vh - 140px);
         max-height: 700px;
         margin: 20px auto;
         max-width: 1200px;
@@ -36,28 +37,85 @@
         border-radius: 12px;
         overflow: hidden;
         background-color: white;
+        position: relative;
+    }
+    
+    @media (min-width: 768px) {
+        .chat-container {
+            flex-direction: row;
+        }
     }
     
     .sidebar {
-        width: 28%;
+        width: 100%;
+        height: 100%;
         background: white;
-        border-right: 1px solid var(--gray-200);
         overflow-y: auto;
         transition: all 0.3s ease;
+        display: none;
+        position: absolute;
+        z-index: 20;
+        top: 0;
+        left: 0;
+    }
+    
+    .sidebar.active {
+        display: block;
+    }
+    
+    @media (min-width: 768px) {
+        .sidebar {
+            width: 280px;
+            display: block;
+            position: relative;
+            border-right: 1px solid var(--gray-200);
+        }
+    }
+    
+    @media (min-width: 992px) {
+        .sidebar {
+            width: 320px;
+        }
     }
     
     .sidebar-header {
-        padding: 20px;
+        padding: 15px;
         background-color: var(--primary);
         color: white;
         font-weight: 600;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         letter-spacing: 0.5px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    @media (min-width: 768px) {
+        .sidebar-header {
+            padding: 20px;
+            font-size: 1.2rem;
+        }
+    }
+    
+    .sidebar-close {
+        display: block;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+    }
+    
+    @media (min-width: 768px) {
+        .sidebar-close {
+            display: none;
+        }
     }
     
     .chat-area {
-        width: 72%;
+        width: 100%;
+        height: 100%;
         display: flex;
         flex-direction: column;
         background: var(--gradient-bg);
@@ -65,10 +123,22 @@
     }
     
     .chat-header {
-        padding: 15px 20px;
+        padding: 12px 15px;
         background-color: white;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         z-index: 10;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    @media (min-width: 768px) {
+        .chat-header {
+            padding: 15px 20px;
+        }
+    }
+    
+    .chat-header-left {
         display: flex;
         align-items: center;
     }
@@ -77,33 +147,72 @@
         font-weight: 600;
         margin: 0;
         color: var(--dark);
-        font-size: 1.1rem;
+        font-size: 1rem;
+    }
+    
+    @media (min-width: 768px) {
+        .chat-header h2 {
+            font-size: 1.1rem;
+        }
+    }
+    
+    .menu-toggle {
+        background: none;
+        border: none;
+        color: var(--dark);
+        margin-right: 10px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    @media (min-width: 768px) {
+        .menu-toggle {
+            display: none;
+        }
     }
     
     .user-avatar {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
         background-color: var(--primary-light);
         color: white;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 15px;
+        margin-right: 12px;
         font-weight: 600;
-        font-size: 1.1rem;
+        font-size: 1rem;
+    }
+    
+    @media (min-width: 768px) {
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+            font-size: 1.1rem;
+        }
     }
     
     .messages-container {
         flex: 1;
         overflow-y: auto;
-        padding: 20px;
+        padding: 15px;
         background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNmNWY1ZjUiPjwvcmVjdD4KPC9zdmc+');
         scroll-behavior: smooth;
     }
     
+    @media (min-width: 768px) {
+        .messages-container {
+            padding: 20px;
+        }
+    }
+    
     .message {
-        margin-bottom: 20px;
+        margin-bottom: 16px;
         clear: both;
         overflow: hidden;
         animation: fadeIn 0.3s ease;
@@ -120,11 +229,20 @@
         background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
         color: white;
         border-radius: 18px 18px 0 18px;
-        padding: 12px 18px;
-        max-width: 75%;
+        padding: 10px 14px;
+        max-width: 85%;
         box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);
         position: relative;
-        margin-left: 40px;
+        margin-left: 10px;
+        word-wrap: break-word;
+    }
+    
+    @media (min-width: 576px) {
+        .message-right {
+            max-width: 75%;
+            padding: 12px 18px;
+            margin-left: 40px;
+        }
     }
     
     .message-left {
@@ -132,18 +250,34 @@
         background-color: white;
         color: var(--dark);
         border-radius: 18px 18px 18px 0;
-        padding: 12px 18px;
-        max-width: 75%;
+        padding: 10px 14px;
+        max-width: 85%;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         position: relative;
-        margin-right: 40px;
+        margin-right: 10px;
+        word-wrap: break-word;
+    }
+    
+    @media (min-width: 576px) {
+        .message-left {
+            max-width: 75%;
+            padding: 12px 18px;
+            margin-right: 40px;
+        }
     }
     
     .message-time {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         color: rgba(255, 255, 255, 0.7);
-        margin-top: 5px;
+        margin-top: 4px;
         text-align: right;
+    }
+    
+    @media (min-width: 576px) {
+        .message-time {
+            font-size: 0.7rem;
+            margin-top: 5px;
+        }
     }
     
     .message-left .message-time {
@@ -151,22 +285,35 @@
     }
     
     .message-form {
-        padding: 15px 20px;
+        padding: 10px 15px;
         background-color: white;
         display: flex;
         align-items: center;
         border-top: 1px solid var(--gray-200);
     }
     
+    @media (min-width: 768px) {
+        .message-form {
+            padding: 15px 20px;
+        }
+    }
+    
     .message-input {
         flex: 1;
-        padding: 12px 20px;
+        padding: 10px 15px;
         border: 1px solid var(--gray-300);
         border-radius: 24px;
-        margin-right: 10px;
+        margin-right: 8px;
         font-size: 0.95rem;
         transition: all 0.2s ease;
         outline: none;
+    }
+    
+    @media (min-width: 768px) {
+        .message-input {
+            padding: 12px 20px;
+            margin-right: 10px;
+        }
     }
     
     .message-input:focus {
@@ -179,14 +326,22 @@
         color: white;
         border: none;
         border-radius: 50%;
-        width: 46px;
-        height: 46px;
+        width: 40px;
+        height: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         transition: all 0.2s ease;
         box-shadow: 0 2px 10px rgba(67, 97, 238, 0.3);
+        flex-shrink: 0;
+    }
+    
+    @media (min-width: 768px) {
+        .send-button {
+            width: 46px;
+            height: 46px;
+        }
     }
     
     .send-button:hover {
@@ -195,22 +350,41 @@
     }
     
     .send-icon {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
         fill: currentColor;
     }
     
+    @media (min-width: 768px) {
+        .send-icon {
+            width: 20px;
+            height: 20px;
+        }
+    }
+    
     .user-list {
-        padding: 10px 0;
+        padding: 8px 0;
+    }
+    
+    @media (min-width: 768px) {
+        .user-list {
+            padding: 10px 0;
+        }
     }
     
     .user-item {
-        padding: 12px 20px;
+        padding: 10px 15px;
         cursor: pointer;
         transition: all 0.2s ease;
         display: flex;
         align-items: center;
         justify-content: space-between;
+    }
+    
+    @media (min-width: 768px) {
+        .user-item {
+            padding: 12px 20px;
+        }
     }
     
     .user-item:hover {
@@ -228,16 +402,25 @@
     }
     
     .user-avatar-sm {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
         background-color: var(--primary-light);
         color: white;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 15px;
+        margin-right: 12px;
         font-weight: 500;
+        flex-shrink: 0;
+    }
+    
+    @media (min-width: 768px) {
+        .user-avatar-sm {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+        }
     }
     
     .user-active .user-avatar-sm {
@@ -248,11 +431,15 @@
         display: flex;
         align-items: center;
         flex: 1;
+        min-width: 0;
     }
     
     .user-name {
         color: var(--gray-700);
         font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .unread-badge {
@@ -267,6 +454,7 @@
         align-items: center;
         justify-content: center;
         padding: 0 6px;
+        flex-shrink: 0;
     }
     
     .empty-state {
@@ -281,18 +469,38 @@
     }
     
     .empty-state-icon {
-        font-size: 4rem;
-        margin-bottom: 20px;
+        font-size: 3rem;
+        margin-bottom: 15px;
         color: var(--gray-300);
     }
     
+    @media (min-width: 768px) {
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+    }
+    
     .empty-state-text {
-        font-size: 1.1rem;
-        margin-bottom: 10px;
+        font-size: 1rem;
+        margin-bottom: 8px;
+    }
+    
+    @media (min-width: 768px) {
+        .empty-state-text {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
     }
     
     .empty-state-subtext {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
+    }
+    
+    @media (min-width: 768px) {
+        .empty-state-subtext {
+            font-size: 0.9rem;
+        }
     }
 
     /* Custom scrollbar */
@@ -312,9 +520,9 @@
     /* Copyright Footer */
     .copyright {
         text-align: center;
-        padding: 15px;
+        padding: 12px;
         color: var(--gray-600);
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         background: white;
         border-top: 1px solid var(--gray-200);
         margin-top: 10px;
@@ -323,13 +531,40 @@
         font-weight: 500;
         letter-spacing: 0.5px;
     }
+    
+    @media (min-width: 768px) {
+        .copyright {
+            padding: 15px;
+            font-size: 0.85rem;
+        }
+    }
+    
+    /* Dark overlay for mobile sidebar */
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 19;
+        display: none;
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+    }
 </style>
+
+<!-- Sidebar overlay for mobile -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
 
 <div class="chat-container">
     <!-- Sidebar: users list -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            Messages
+            <span>Messages</span>
+            <button class="sidebar-close" id="sidebar-close">×</button>
         </div>
         <div class="user-list">
             @foreach($users as $userOption)
@@ -359,12 +594,21 @@
     <div class="chat-area">
         @if(isset($receiverId))
             <div class="chat-header">
-                <div class="user-avatar">
-                    {{ strtoupper(substr(\App\Models\User::find($receiverId)->name, 0, 1)) }}
+                <div class="chat-header-left">
+                    <button class="menu-toggle" id="menu-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="user-avatar">
+                        {{ strtoupper(substr(\App\Models\User::find($receiverId)->name, 0, 1)) }}
+                    </div>
+                    <h2>
+                        {{ \App\Models\User::find($receiverId)->name }}
+                    </h2>
                 </div>
-                <h2>
-                    {{ \App\Models\User::find($receiverId)->name }}
-                </h2>
             </div>
 
             <!-- Chat Messages -->
@@ -402,6 +646,18 @@
                 </button>
             </form>
         @else
+            <div class="chat-header">
+                <div class="chat-header-left">
+                    <button class="menu-toggle" id="menu-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <h2>Conversations</h2>
+                </div>
+            </div>
             <div class="empty-state">
                 <div class="empty-state-icon">💬</div>
                 <div class="empty-state-text">Select a conversation</div>
@@ -419,7 +675,47 @@
 <script>
     const userId = {{ auth()->id() }};
     const chatBox = document.getElementById('chat-box');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebarClose = document.getElementById('sidebar-close');
+    
+    // Scroll chat to bottom
     if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+    
+    // Mobile sidebar toggle
+    if(menuToggle) {
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.add('active');
+            sidebarOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        });
+    }
+    
+    if(sidebarClose) {
+        sidebarClose.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = ''; // Re-enable scrolling
+        });
+    }
+    
+    if(sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = ''; // Re-enable scrolling
+        });
+    }
+    
+    // Responsive handling - close sidebar when window resizes to desktop
+    window.addEventListener('resize', function() {
+        if(window.innerWidth >= 768) {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
 
     // Function to update unread message counts
     function updateUnreadCounts() {
