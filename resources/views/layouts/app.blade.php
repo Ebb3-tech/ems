@@ -35,8 +35,8 @@
 
     <!-- Notifications -->
     <li class="nav-item me-2">
-        <a href="{{ route('notifications.index') }}" class="nav-link">
-            Notifications ({{ \App\Models\Notification::where('user_id', auth()->id())->count() }})
+        <a href="{{ route('chat.index') }}" class="nav-link">
+            Chat
         </a>
     </li>
 @endauth

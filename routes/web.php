@@ -16,7 +16,8 @@ use App\Http\Controllers\{
     ProductController,
     WalkInCustomerController,
     ShopController,
-    ShopCustomerController
+    ShopCustomerController,
+    ChatController
 };
 use App\Http\Controllers\Auth\{
     LoginController,
@@ -88,6 +89,8 @@ Route::get('/home', function () {
 Route::middleware('auth')->group(function () {
 
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::post('/chat/send', [ChatController::class, 'send'])->name('chat.send');
 
     // Notifications
     Route::resource('notifications', NotificationController::class);
