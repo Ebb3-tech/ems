@@ -9,27 +9,27 @@
         </div>
     @endif
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="fw-bold text-primary">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 gap-2">
+        <h2 class="fw-bold text-primary h3">
             <i class="fas fa-file-alt me-2"></i>Daily Report Details
         </h2>
-        <div class="d-flex gap-2">
-            <a href="{{ route('daily-reports.index') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-1"></i> Back to Reports
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ route('daily-reports.index') }}" class="btn btn-outline-secondary btn-sm btn-md-normal">
+                <i class="fas fa-arrow-left me-1"></i> Back
             </a>
 
             @if(auth()->user()->role == 5)
-            <a href="{{ route('daily-reports.download', $report->id) }}" class="btn btn-outline-success">
-                <i class="fas fa-download me-1"></i> Download Report
+            <a href="{{ route('daily-reports.download', $report->id) }}" class="btn btn-outline-success btn-sm btn-md-normal">
+                <i class="fas fa-download me-1"></i> Download
             </a>
             @endif
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-8">
+    <div class="row g-4">
+        <div class="col-12 col-lg-8">
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <div class="card-header bg-white py-3 d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
                     <h5 class="mb-0 fw-bold">Report Information</h5>
                     @if(auth()->user()->id == $report->user_id || auth()->user()->role == 5)
                         <a href="{{ route('daily-reports.edit', $report) }}" class="btn btn-sm btn-outline-primary">
@@ -37,17 +37,17 @@
                         </a>
                     @endif
                 </div>
-                <div class="card-body p-4">
+                <div class="card-body p-3 p-md-4">
                     {{-- User Info --}}
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                    <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center mb-4 gap-2 gap-sm-0">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-2 p-md-3 me-sm-3">
                             <i class="fas fa-user fa-lg text-primary"></i>
                         </div>
                         <div>
                             <div class="text-muted small">Submitted by</div>
-                            <h5 class="mb-0 fw-bold">{{ $report->user->name }}</h5>
+                            <h5 class="mb-0 fw-bold fs-6">{{ $report->user->name }}</h5>
                         </div>
-                        <div class="ms-auto text-end">
+                        <div class="ms-sm-auto mt-2 mt-sm-0 text-start text-sm-end">
                             <div class="text-muted small">Date</div>
                             <div class="fw-medium">
                                 <i class="far fa-calendar-alt me-1"></i> {{ $report->report_date }}
@@ -61,7 +61,7 @@
                             <i class="fas fa-align-left text-primary me-1"></i> Report Content
                         </h6>
                         <div class="p-3 bg-light rounded">
-                            <p class="mb-0">{{ $report->content }}</p>
+                            <p class="mb-0 text-break">{{ $report->content }}</p>
                         </div>
                     </div>
 
@@ -73,7 +73,7 @@
                         </h6>
                         <div class="text-center bg-light rounded p-3">
                             <img src="{{ asset('storage/' . $report->image) }}" alt="Report Image" 
-                                 class="img-fluid rounded shadow-sm" style="max-height: 300px;">
+                                 class="img-fluid rounded shadow-sm" style="max-height: 300px; max-width: 100%;">
                         </div>
                     </div>
                     @endif
@@ -82,7 +82,7 @@
                     @if(auth()->user()->role == 5)
                     <div class="mb-3">
                         <h6 class="fw-bold mb-2"><i class="fas fa-star text-primary me-1"></i> Assigned Marks</h6>
-                        <form action="{{ route('daily-reports.assignMarks', $report->id) }}" method="POST" class="d-flex gap-2">
+                        <form action="{{ route('daily-reports.assignMarks', $report->id) }}" method="POST" class="d-flex flex-column flex-sm-row gap-2">
                             @csrf
                             <input type="number" name="marks" min="0" max="100" class="form-control" 
                                    placeholder="Enter marks" value="{{ $report->marks ?? '' }}" required>
@@ -108,7 +108,7 @@
         </div>
 
         {{-- Report Details --}}
-        <div class="col-lg-4">
+        <div class="col-12 col-lg-4">
             <div class="card shadow-sm">
                 <div class="card-header bg-white py-3">
                     <h5 class="mb-0 fw-bold">
@@ -119,33 +119,33 @@
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item px-0 py-3 d-flex">
                             <div class="me-3">
-                                <span class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <span class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
                                     <i class="far fa-calendar-alt text-primary"></i>
                                 </span>
                             </div>
-                            <div>
+                            <div class="text-break">
                                 <div class="text-muted small">Report Date</div>
                                 <div class="fw-medium">{{ $report->report_date }}</div>
                             </div>
                         </li>
                         <li class="list-group-item px-0 py-3 d-flex">
                             <div class="me-3">
-                                <span class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <span class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
                                     <i class="fas fa-user text-primary"></i>
                                 </span>
                             </div>
-                            <div>
+                            <div class="text-break">
                                 <div class="text-muted small">Employee</div>
                                 <div class="fw-medium">{{ $report->user->name }}</div>
                             </div>
                         </li>
                         <li class="list-group-item px-0 py-3 d-flex">
                             <div class="me-3">
-                                <span class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <span class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
                                     <i class="far fa-clock text-primary"></i>
                                 </span>
                             </div>
-                            <div>
+                            <div class="text-break">
                                 <div class="text-muted small">Created At</div>
                                 <div class="fw-medium">{{ $report->created_at->format('Y-m-d H:i') }}</div>
                             </div>
@@ -153,11 +153,11 @@
                         @if($report->updated_at && $report->updated_at->ne($report->created_at))
                         <li class="list-group-item px-0 py-3 d-flex">
                             <div class="me-3">
-                                <span class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <span class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
                                     <i class="fas fa-edit text-primary"></i>
                                 </span>
                             </div>
-                            <div>
+                            <div class="text-break">
                                 <div class="text-muted small">Last Updated</div>
                                 <div class="fw-medium">{{ $report->updated_at->format('Y-m-d H:i') }}</div>
                             </div>
@@ -190,6 +190,28 @@
 }
 .bg-light {
     background-color: #f8f9fa !important;
+}
+.text-break {
+    word-wrap: break-word !important;
+    word-break: break-word !important;
+}
+@media (max-width: 768px) {
+    .btn-sm.btn-md-normal {
+        padding: .25rem .5rem;
+        font-size: .875rem;
+    }
+    
+    /* Make action buttons full width on very small screens */
+    @media (max-width: 375px) {
+        .d-flex.flex-wrap.gap-2 {
+            flex-direction: column;
+            width: 100%;
+        }
+        .d-flex.flex-wrap.gap-2 a {
+            width: 100%;
+            text-align: center;
+        }
+    }
 }
 </style>
 @endsection
