@@ -91,6 +91,9 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::post('/chat/send', [ChatController::class, 'send'])->name('chat.send');
+    Route::post('/daily-reports/{id}/marks', [DailyReportController::class, 'assignMarks'])->name('daily-reports.assignMarks');
+    Route::get('/daily-reports/{id}/download', [DailyReportController::class, 'download'])->name('daily-reports.download');
+
     Route::get('/chat/unread-counts-per-user', function () {
         $unreadCounts = DB::table('messages')
             ->where('receiver_id', auth()->id())

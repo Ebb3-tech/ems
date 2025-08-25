@@ -2,24 +2,43 @@
 
 @section('content')
 <div class="container mt-3">
+    {{-- Flash Message --}}
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="fw-bold text-primary">
             <i class="fas fa-file-alt me-2"></i>Daily Report Details
         </h2>
-        <div>
+        <div class="d-flex gap-2">
             <a href="{{ route('daily-reports.index') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-1"></i> Back to Reports
             </a>
+
+            @if(auth()->user()->role == 5)
+            <a href="{{ route('daily-reports.download', $report->id) }}" class="btn btn-outline-success">
+                <i class="fas fa-download me-1"></i> Download Report
+            </a>
+            @endif
         </div>
     </div>
 
     <div class="row">
         <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white py-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 fw-bold">Report Information</h5>
+                    @if(auth()->user()->id == $report->user_id || auth()->user()->role == 5)
+                        <a href="{{ route('daily-reports.edit', $report) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-edit me-1"></i> Edit Report
+                        </a>
+                    @endif
                 </div>
                 <div class="card-body p-4">
+                    {{-- User Info --}}
                     <div class="d-flex align-items-center mb-4">
                         <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
                             <i class="fas fa-user fa-lg text-primary"></i>
@@ -36,6 +55,7 @@
                         </div>
                     </div>
 
+                    {{-- Report Content --}}
                     <div class="mb-4">
                         <h6 class="fw-bold mb-2">
                             <i class="fas fa-align-left text-primary me-1"></i> Report Content
@@ -45,8 +65,9 @@
                         </div>
                     </div>
 
+                    {{-- Attached Image --}}
                     @if(isset($report->image) && !empty($report->image))
-                    <div>
+                    <div class="mb-4">
                         <h6 class="fw-bold mb-2">
                             <i class="fas fa-image text-primary me-1"></i> Attached Image
                         </h6>
@@ -56,28 +77,42 @@
                         </div>
                     </div>
                     @endif
+
+                    {{-- Assign Marks (CEO only) --}}
+                    @if(auth()->user()->role == 5)
+                    <div class="mb-3">
+                        <h6 class="fw-bold mb-2"><i class="fas fa-star text-primary me-1"></i> Assign Marks</h6>
+                        <form action="{{ route('daily-reports.assignMarks', $report->id) }}" method="POST" class="d-flex gap-2">
+                            @csrf
+                            <input type="number" name="marks" min="0" max="100" class="form-control" 
+                                   placeholder="Enter marks" value="{{ $report->marks ?? '' }}" required>
+                            <button type="submit" class="btn btn-success">Assign</button>
+                        </form>
+                    </div>
+                    @endif
+
+                    {{-- Display Marks --}}
+                    @if(isset($report->marks))
+                    <div>
+                        <strong>Marks:</strong> {{ $report->marks }}/100
+                    </div>
+                    @endif
                 </div>
+
                 <div class="card-footer bg-white d-flex justify-content-between py-3">
                     <div class="text-muted small">
                         <i class="far fa-clock me-1"></i> Submitted {{ $report->created_at->diffForHumans() }}
                     </div>
-                    
-                    @if(auth()->user()->id == $report->user_id || auth()->user()->role == 5)
-                    <div>
-                        <a href="{{ route('daily-reports.edit', $report) }}" class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-edit me-1"></i> Edit Report
-                        </a>
-                    </div>
-                    @endif
                 </div>
             </div>
         </div>
-        
+
+        {{-- Report Details --}}
         <div class="col-lg-4">
             <div class="card shadow-sm">
                 <div class="card-header bg-white py-3">
                     <h5 class="mb-0 fw-bold">
-                        <i class="fas fa-info-circle me-2"></i>Report Details
+                        <i class="fas fa-info-circle me-2"></i> Report Details
                     </h5>
                 </div>
                 <div class="card-body">
@@ -135,7 +170,7 @@
     </div>
 </div>
 
-{{-- Add Font Awesome if not already included in your layout --}}
+{{-- Font Awesome --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>

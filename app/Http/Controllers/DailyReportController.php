@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DailyReport;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\DailyReport;
 
 class DailyReportController extends Controller
 {
@@ -103,6 +103,28 @@ public function destroy(DailyReport $dailyReport)
 
     return redirect()->route('daily-reports.index')
         ->with('success', 'Daily report deleted successfully.');
+}
+
+public function assignMarks(Request $request, $reportId)
+{
+    $request->validate([
+        'marks' => 'required|integer|min:0|max:100',
+    ]);
+
+    $report = \App\Models\DailyReport::findOrFail($reportId);
+    $report->marks = $request->marks;
+    $report->save();
+
+    return redirect()->back()->with('success', 'Marks assigned successfully!');
+}
+
+public function download($id)
+{
+    $report = DailyReport::findOrFail($id);
+
+    $pdf = Pdf::loadView('daily-reports.pdf', compact('report'));
+
+    return $pdf->download('report_'.$report->id.'.pdf');
 }
 
 }
