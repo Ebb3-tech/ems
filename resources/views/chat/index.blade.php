@@ -210,6 +210,7 @@
         transition: all 0.2s ease;
         display: flex;
         align-items: center;
+        justify-content: space-between;
     }
     
     .user-item:hover {
@@ -243,9 +244,29 @@
         background-color: var(--primary);
     }
     
+    .user-info {
+        display: flex;
+        align-items: center;
+        flex: 1;
+    }
+    
     .user-name {
         color: var(--gray-700);
         font-size: 0.95rem;
+    }
+    
+    .unread-badge {
+        background-color: var(--secondary);
+        color: white;
+        border-radius: 50%;
+        min-width: 20px;
+        height: 20px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 6px;
     }
     
     .empty-state {
@@ -314,12 +335,20 @@
             @foreach($users as $userOption)
                 <a href="{{ route('chat.index', ['receiver_id' => $userOption->id]) }}" style="text-decoration: none; color: inherit;">
                     <div class="user-item {{ (isset($receiverId) && $receiverId==$userOption->id) ? 'user-active' : '' }}">
-                        <div class="user-avatar-sm">
-                            {{ strtoupper(substr($userOption->name, 0, 1)) }}
+                        <div class="user-info">
+                            <div class="user-avatar-sm">
+                                {{ strtoupper(substr($userOption->name, 0, 1)) }}
+                            </div>
+                            <div class="user-name">
+                                {{ $userOption->name }}
+                            </div>
                         </div>
-                        <div class="user-name">
-                            {{ $userOption->name }}
-                        </div>
+                        
+                        @if(isset($unreadCounts[$userOption->id]) && $unreadCounts[$userOption->id] > 0)
+                            <div class="unread-badge" id="unread-count-{{ $userOption->id }}">
+                                {{ $unreadCounts[$userOption->id] }}
+                            </div>
+                        @endif
                     </div>
                 </a>
             @endforeach
@@ -392,9 +421,49 @@
     const chatBox = document.getElementById('chat-box');
     if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
 
+    // Function to update unread message counts
+    function updateUnreadCounts() {
+        fetch('/chat/unread-counts-per-user', {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            Object.keys(data.counts).forEach(senderId => {
+                const badge = document.getElementById(`unread-count-${senderId}`);
+                const count = data.counts[senderId];
+                
+                if (count > 0) {
+                    if (badge) {
+                        badge.textContent = count;
+                    } else {
+                        const userItem = document.querySelector(`a[href*="receiver_id=${senderId}"] .user-item`);
+                        if (userItem) {
+                            const unreadBadge = document.createElement('div');
+                            unreadBadge.className = 'unread-badge';
+                            unreadBadge.id = `unread-count-${senderId}`;
+                            unreadBadge.textContent = count;
+                            userItem.appendChild(unreadBadge);
+                        }
+                    }
+                } else if (badge) {
+                    badge.remove();
+                }
+            });
+        });
+    }
+
+    // Check for current receiver ID
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentReceiverId = urlParams.get('receiver_id');
+
     window.Echo.private('chat.' + userId)
         .listen('MessageSent', (e) => {
             if(!chatBox) return;
+            
+            // Add the message to the chat if it's from current conversation
             if(e.chat.sender_id === {{ auth()->id() }} || e.chat.receiver_id === {{ auth()->id() }}) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'message';
@@ -423,7 +492,47 @@
                 messageDiv.appendChild(messageContent);
                 chatBox.appendChild(messageDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
+                
+                // If we're currently viewing messages from this sender,
+                // mark them as read
+                if (currentReceiverId && currentReceiverId == e.chat.sender_id) {
+                    markMessagesAsRead(e.chat.sender_id);
+                } else {
+                    // Otherwise update unread counts
+                    updateUnreadCounts();
+                }
             }
         });
+        
+    // Function to mark messages as read
+    function markMessagesAsRead(senderId) {
+        fetch('/chat/mark-read-from-sender', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ sender_id: senderId })
+        })
+        .then(() => {
+            // Update unread counts after marking as read
+            updateUnreadCounts();
+        });
+    }
+    
+    // Mark messages as read when opening a conversation
+    if (currentReceiverId) {
+        markMessagesAsRead(currentReceiverId);
+    }
+    
+    // Update unread counts periodically
+    setInterval(updateUnreadCounts, 15000);
+    
+    // Initial update
+    document.addEventListener('DOMContentLoaded', function() {
+        updateUnreadCounts();
+    });
 </script>
 @endsection

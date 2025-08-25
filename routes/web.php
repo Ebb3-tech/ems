@@ -91,6 +91,27 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::post('/chat/send', [ChatController::class, 'send'])->name('chat.send');
+    Route::get('/chat/unread-counts-per-user', function () {
+        $unreadCounts = DB::table('messages')
+            ->where('receiver_id', auth()->id())
+            ->where('is_read', false)
+            ->select('sender_id', DB::raw('count(*) as count'))
+            ->groupBy('sender_id')
+            ->pluck('count', 'sender_id')
+            ->toArray();
+            
+        return response()->json(['counts' => $unreadCounts]);
+    });
+    
+    Route::post('/chat/mark-read-from-sender', function (Request $request) {
+        DB::table('messages')
+            ->where('receiver_id', auth()->id())
+            ->where('sender_id', $request->sender_id)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+            
+        return response()->json(['success' => true]);
+    });
 
     // Notifications
     Route::resource('notifications', NotificationController::class);
