@@ -152,7 +152,7 @@
                         </tr>
                     </thead>
                     <tbody id="requests-table-body">
-                        @foreach($requests as $req)
+                        @foreach($requests->sortByDesc('created_at') as $req)
                         <tr>
                             <td class="ps-3 fw-medium">{{ $req->customer->name }}</td>
                             <td>{{ $req->customer->phone }}</td>
@@ -262,6 +262,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (phone) params.append('phone', phone);
         if (source) params.append('source', source);
         if (status) params.append('status', status);
+        // Ensure newest customers are on top
+        params.append('sort', 'newest');
         
         // Show loading indicator
         const tbody = document.getElementById('requests-table-body');
@@ -311,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <td class="ps-3 fw-medium">${req.customer.name}</td>
                         <td>${req.customer.phone}</td>
                         <td>${req.need}</td>
-                                                <td>${new Date(req.created_at).toLocaleString()}</td>
+                        <td>${new Date(req.created_at).toLocaleString()}</td>
                         <td><span class="badge bg-light text-dark">${sourceIcon}</span></td>
                         <td>
                             <div class="d-flex align-items-center">
@@ -327,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </td>
                         <td class="text-center">
-                            <a href="{{ route('customers.history', $req->customer->id) }}" class="btn btn-sm btn-outline-info rounded-circle" title="View details">
+                            <a href="/customers/history/${req.customer.id}" class="btn btn-sm btn-outline-info rounded-circle" title="View details">
                                 <i class="fas fa-eye"></i>
                             </a>
                         </td>
