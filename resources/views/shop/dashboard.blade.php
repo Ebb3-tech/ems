@@ -105,71 +105,7 @@
         </div>
     </div>
 
-    {{-- Status Cards - Like the Hamubere Dashboard --}}
-    <div class="card shadow-sm mb-3">
-        <div class="card-header bg-white py-2">
-            <h5 class="mb-0 fs-6 fs-md-5"><i class="fas fa-chart-pie me-1"></i> Status Overview</h5>
-        </div>
-        <div class="card-body bg-light py-2">
-            <div class="row g-2">
-                @foreach(['pending'=>'warning','processing'=>'primary','completed'=>'success','canceled'=>'danger'] as $status => $color)
-                <div class="col-3 col-md-3">
-                    <div class="card border-0 rounded-2 clickable-card h-100" data-status="{{ $status }}">
-                        <div class="card-body bg-{{ $color }} text-white rounded-2 p-2">
-                            <div class="d-flex flex-column align-items-center">
-                                <span class="card-title mb-0 small d-none d-sm-block">{{ ucfirst($status) }}</span>
-                                <span class="card-title mb-0 small d-block d-sm-none">{{ ucfirst($status)[0] }}</span>
-                                <h5 class="mb-0 fw-bold">{{ \App\Models\Task::where('status', $status)->where('assigned_to', Auth::id())->count() }}</h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
-
-    {{-- Quick Actions --}}
-    <div class="card shadow-sm mb-3">
-        <div class="card-header bg-white py-2">
-            <h5 class="mb-0 fs-6 fs-md-5"><i class="fas fa-bolt me-1"></i> Quick Actions</h5>
-        </div>
-        <div class="card-body py-2">
-            <div class="row g-2">
-                <div class="col-6 col-md-3">
-                    <a href="{{ route('shop.vendors.create') }}" class="btn btn-outline-primary w-100 text-truncate">
-                        <i class="fas fa-store d-none d-sm-inline-block me-1"></i> Add Vendor
-                    </a>
-                </div>
-                <div class="col-6 col-md-3">
-                    <a href="{{ route('shop.products.create') }}" class="btn btn-outline-success w-100 text-truncate">
-                        <i class="fas fa-box d-none d-sm-inline-block me-1"></i> Add Product
-                    </a>
-                </div>
-                <div class="col-6 col-md-3">
-                    <a href="{{ route('shop.walk-in-customers.create') }}" class="btn btn-outline-warning w-100 text-truncate">
-                        <i class="fas fa-user-plus d-none d-sm-inline-block me-1"></i> New Customer
-                    </a>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <a href="{{ route('attendance.create') }}" class="btn btn-outline-secondary w-100">
-                                <i class="fas fa-clock d-md-inline-block d-none me-1"></i> <span class="d-md-inline d-none">Attendance</span>
-                                <i class="fas fa-clock d-md-none"></i>
-                            </a>
-                        </div>
-                        <div class="col-6">
-                            <a href="{{ route('daily-reports.index') }}" class="btn btn-outline-info w-100">
-                                <i class="fas fa-file-alt d-md-inline-block d-none me-1"></i> <span class="d-md-inline d-none">Report</span>
-                                <i class="fas fa-file-alt d-md-none"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
 
     {{-- Latest Vendors Table - Mobile Responsive --}}
