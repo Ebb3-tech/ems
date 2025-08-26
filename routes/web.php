@@ -39,6 +39,7 @@ use App\Models\{
     WalkInCustomer
 };
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\SaleController;
 
 // Helper function for role-based dashboard redirect
 if (!function_exists('redirectToAllowedDashboard')) {
@@ -87,7 +88,9 @@ Route::get('/home', function () {
 
 // Protected routes
 Route::middleware('auth')->group(function () {
-
+    Route::get('/sales/filter', [SaleController::class, 'filter'])->name('sales.filter');
+    Route::get('/vendors/{vendor}/products', [SaleController::class, 'getVendorProducts']);
+    Route::resource('sales', SaleController::class);
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::post('/chat/send', [ChatController::class, 'send'])->name('chat.send');

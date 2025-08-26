@@ -122,4 +122,15 @@ class TaskController extends Controller
     return view('tasks.show', compact('task'));
 }
 
+public function updateStatus(Request $request, Task $task)
+{
+    $request->validate([
+        'status' => 'required|in:not_started,in_progress,completed,on_hold,cancelled',
+    ]);
+
+    $task->update(['status' => $request->status]);
+
+    return redirect()->back()->with('success', 'Task status updated successfully!');
+}
+
 }

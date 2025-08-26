@@ -30,7 +30,7 @@
                         <h4 class="mt-3 mb-0 fw-bold">{{ $product->name }}</h4>
                         <div class="mt-2">
                             <span class="badge bg-success px-3 py-2">
-                                <i class="fas fa-tag me-1"></i> ${{ $product->price ?? '0.00' }}
+                                <i class="fas fa-tag me-1"></i> Frw{{ $product->price ?? '0.00' }}
                             </span>
                         </div>
                     </div>
