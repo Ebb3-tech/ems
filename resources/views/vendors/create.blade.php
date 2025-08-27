@@ -13,7 +13,7 @@
                 <div class="card-body p-4">
                     <form action="{{ route('shop.vendors.store') }}" method="POST">
                         @csrf
-                        
+
                         <div class="mb-3">
                             <label for="name" class="form-label fw-medium">Vendor Name</label>
                             <div class="input-group">
@@ -44,7 +44,7 @@
                             </div>
                         </div>
                         
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label for="phone" class="form-label fw-medium">Phone Number</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light">
@@ -58,7 +58,37 @@
                                 @enderror
                             </div>
                         </div>
-                        
+
+                        <div class="mb-3">
+                            <label for="category" class="form-label fw-medium">Category</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-tag text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control @error('category') is-invalid @enderror" 
+                                    id="category" name="category" value="{{ old('category', $vendor->category ?? '') }}" 
+                                    placeholder="Enter vendor category">
+                                @error('category')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="email" class="form-label fw-medium">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-envelope text-muted"></i>
+                                </span>
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                                    id="email" name="email" value="{{ old('email', $vendor->email ?? '') }}" 
+                                    placeholder="Enter email address">
+                                @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
                         <div class="d-flex justify-content-between mt-4">
                             <a href="{{ route('shop.vendors.index') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left me-1"></i> Cancel
@@ -74,29 +104,27 @@
     </div>
 </div>
 
-{{-- Add Font Awesome if not already included in your layout --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <style>
-.input-group-text {
-    border-right: 0;
-}
-.form-control {
-    border-left: 0;
-}
-.input-group:focus-within .input-group-text {
-    border-color: #86b7fe;
-}
-.card {
-    border-radius: 8px;
-    overflow: hidden;
-}
-.form-control:focus {
-    box-shadow: none;
-}
-.input-group:focus-within {
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-    border-radius: 0.375rem;
-}
+    .input-group-text {
+        border-right: 0;
+    }
+    .form-control {
+        border-left: 0;
+    }
+    .input-group:focus-within .input-group-text {
+        border-color: #86b7fe;
+    }
+    .card {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .form-control:focus {
+        box-shadow: none;
+    }
+    .input-group:focus-within {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        border-radius: 0.375rem;
+    }
 </style>
 @endsection

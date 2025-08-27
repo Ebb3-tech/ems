@@ -1,6 +1,6 @@
 @extends('layouts.app')
-
 @section('content')
+
 <div class="container mt-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="fw-bold text-primary"><i class="fas fa-store me-2"></i>Vendors</h2>
@@ -31,18 +31,39 @@
                             <th class="ps-3">Name</th>
                             <th>Location</th>
                             <th>Phone</th>
+                            <th>Category</th>
+                            <th>Email</th>
                             <th class="text-end pe-3">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($vendors as $vendor)
                             <tr>
-                                <td class="ps-3 fw-medium">{{ $vendor->name }}</td>
-                                <td>
-                                    <i class="fas fa-map-marker-alt text-muted me-1"></i> {{ $vendor->location }}
+                                <td class="ps-3 fw-medium">
+                                    <i class="fas fa-store text-primary me-2"></i> {{ $vendor->name }}
                                 </td>
                                 <td>
-                                    <i class="fas fa-phone text-muted me-1"></i> {{ $vendor->phone }}
+                                    <i class="fas fa-map-marker-alt text-danger me-1"></i> {{ $vendor->location }}
+                                </td>
+                                <td>
+                                    <i class="fas fa-phone text-success me-1"></i> {{ $vendor->phone }}
+                                </td>
+                                <td>
+                                    @if($vendor->category)
+                                        <span class="badge bg-info">{{ $vendor->category }}</span>
+                                    @else
+                                        <span class="text-muted small">Not specified</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($vendor->email)
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-envelope text-primary me-2"></i>
+                                            <span>{{ $vendor->email }}</span>
+                                        </div>
+                                    @else
+                                        <span class="text-muted small">Not available</span>
+                                    @endif
                                 </td>
                                 <td class="text-end pe-3">
                                     <a href="{{ route('shop.vendors.show', $vendor) }}" class="btn btn-sm btn-outline-primary me-1" title="View details">
@@ -61,7 +82,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center py-4">
+                                <td colspan="6" class="text-center py-4">
                                     <div class="d-flex flex-column align-items-center">
                                         <i class="fas fa-store-slash fa-3x text-muted mb-2"></i>
                                         <p class="text-muted">No vendors found</p>
@@ -79,31 +100,35 @@
     </div>
 </div>
 
-{{-- Add Font Awesome if not already included in your layout --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <style>
-.table th, .table td {
-    padding: 0.6rem 0.75rem;
-}
-.btn-outline-primary, .btn-outline-success, .btn-outline-danger {
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-.btn-outline-primary:hover, .btn-outline-success:hover, .btn-outline-danger:hover {
-    color: white;
-}
-.card {
-    overflow: hidden;
-    transition: box-shadow 0.2s;
-}
-.card:hover {
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
-}
+    .table th, .table td {
+        padding: 0.6rem 0.75rem;
+    }
+    .btn-outline-primary, .btn-outline-success, .btn-outline-danger {
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-outline-primary:hover, .btn-outline-success:hover, .btn-outline-danger:hover {
+        color: white;
+    }
+    .card {
+        overflow: hidden;
+        transition: box-shadow 0.2s;
+        border: none;
+    }
+    .card:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+    }
+    .badge.bg-info {
+        font-weight: 500;
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
+    }
 </style>
 @endsection

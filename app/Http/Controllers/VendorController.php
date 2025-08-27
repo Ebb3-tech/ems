@@ -24,10 +24,13 @@ class VendorController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'     => 'required|string|max:255',
-            'location' => 'required|string|max:255',
-            'phone'    => 'required|string|max:20',
-        ]);
+    'name'     => 'required|string|max:255',
+    'location' => 'nullable|string|max:255',
+    'phone'    => 'nullable|string|max:20',
+    'category' => 'nullable|string|max:100',
+    'email'    => 'nullable|email|max:255',
+]);
+
 
         Vendor::create($request->all());
 

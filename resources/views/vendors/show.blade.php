@@ -28,6 +28,9 @@
                             <i class="fas fa-store fa-2x text-primary"></i>
                         </div>
                         <h4 class="mt-3 mb-0 fw-bold">{{ $vendor->name }}</h4>
+                        @if($vendor->category)
+                            <span class="badge bg-info mt-2">{{ $vendor->category }}</span>
+                        @endif
                     </div>
                     
                     <div class="list-group list-group-flush">
@@ -54,6 +57,20 @@
                                 <div class="fw-medium">{{ $vendor->phone }}</div>
                             </div>
                         </div>
+                        
+                        @if($vendor->email)
+                        <div class="list-group-item px-0 py-3 d-flex">
+                            <div class="me-3">
+                                <span class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-envelope text-primary"></i>
+                                </span>
+                            </div>
+                            <div>
+                                <div class="text-muted small">Email Address</div>
+                                <div class="fw-medium">{{ $vendor->email }}</div>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -108,30 +125,34 @@
     </div>
 </div>
 
-{{-- Add Font Awesome if not already included in your layout --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <style>
-.card {
-    border-radius: 8px;
-    overflow: hidden;
-    transition: box-shadow 0.2s;
-}
-.card:hover {
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
-}
-.list-group-item {
-    border-left: 0;
-    border-right: 0;
-    border-color: #f5f5f5;
-}
-.table th, .table td {
-    padding: 0.75rem 1rem;
-}
-.badge.bg-success {
-    font-weight: 500;
-    font-size: 0.85rem;
-    padding: 0.4rem 0.6rem;
-}
+    .card {
+        border-radius: 8px;
+        overflow: hidden;
+        transition: box-shadow 0.2s;
+        border: none;
+    }
+    .card:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+    }
+    .list-group-item {
+        border-left: 0;
+        border-right: 0;
+        border-color: #f5f5f5;
+    }
+    .table th, .table td {
+        padding: 0.75rem 1rem;
+    }
+    .badge.bg-success {
+        font-weight: 500;
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
+    }
+    .badge.bg-info {
+        font-weight: 500;
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
+    }
 </style>
 @endsection

@@ -1,27 +1,131 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-2xl mx-auto p-4 bg-white shadow rounded">
-    <h2 class="text-xl font-bold mb-4">Edit Vendor</h2>
+<div class="container mt-3">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-edit me-2 text-primary"></i>Edit Vendor
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ route('shop.vendors.update', $vendor) }}" method="POST">
+                        @csrf 
+                        @method('PUT')
 
-    <form action="{{ route('shop.vendors.update', $vendor) }}" method="POST">
-        @csrf @method('PUT')
-        <div class="mb-3">
-            <label class="block font-semibold">Name</label>
-            <input type="text" name="name" value="{{ $vendor->name }}" class="w-full border rounded p-2" required>
-        </div>
-        <div class="mb-3">
-            <label class="block font-semibold">Location</label>
-            <input type="text" name="location" value="{{ $vendor->location }}" class="w-full border rounded p-2" required>
-        </div>
-        <div class="mb-3">
-            <label class="block font-semibold">Phone</label>
-            <input type="text" name="phone" value="{{ $vendor->phone }}" class="w-full border rounded p-2" required>
-        </div>
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-medium">Vendor Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-building text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                                    id="name" name="name" value="{{ old('name', $vendor->name) }}" 
+                                    placeholder="Enter vendor name" required>
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="location" class="form-label fw-medium">Location</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-map-marker-alt text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control @error('location') is-invalid @enderror" 
+                                    id="location" name="location" value="{{ old('location', $vendor->location) }}" 
+                                    placeholder="Enter vendor location" required>
+                                @error('location')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="phone" class="form-label fw-medium">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-phone text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control @error('phone') is-invalid @enderror" 
+                                    id="phone" name="phone" value="{{ old('phone', $vendor->phone) }}" 
+                                    placeholder="Enter phone number" required>
+                                @error('phone')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
 
-        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">
-            Update Vendor
-        </button>
-    </form>
+                        <div class="mb-3">
+                            <label for="category" class="form-label fw-medium">Category</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-tag text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control @error('category') is-invalid @enderror" 
+                                    id="category" name="category" value="{{ old('category', $vendor->category ?? '') }}" 
+                                    placeholder="Enter vendor category">
+                                @error('category')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="email" class="form-label fw-medium">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-envelope text-muted"></i>
+                                </span>
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                                    id="email" name="email" value="{{ old('email', $vendor->email ?? '') }}" 
+                                    placeholder="Enter email address">
+                                @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ route('shop.vendors.index') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success px-4">
+                                <i class="fas fa-save me-1"></i> Update Vendor
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    .input-group-text {
+        border-right: 0;
+    }
+    .form-control {
+        border-left: 0;
+    }
+    .input-group:focus-within .input-group-text {
+        border-color: #86b7fe;
+    }
+    .card {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .form-control:focus {
+        box-shadow: none;
+    }
+    .input-group:focus-within {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        border-radius: 0.375rem;
+    }
+</style>
 @endsection

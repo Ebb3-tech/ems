@@ -10,8 +10,13 @@ class Vendor extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'location', 'phone', 
-    ];
+    'name',
+    'location',
+    'phone',
+    'category',
+    'email',
+];
+
 
     // ✅ A vendor has many products
     public function products()
