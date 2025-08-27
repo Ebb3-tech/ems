@@ -57,25 +57,11 @@ class TaskController extends Controller
         return view('tasks.edit', compact('task', 'users', 'departments'));
     }
 
-    public function update(Request $request, Task $task)
+   public function update(Request $request, Task $task)
 {
     $user = auth()->user();
 
-    if ($user->role == 1) { // Employee role
-        $request->validate([
-            'status' => 'required|in:pending,in_progress,completed,on_hold',
-            'attachment' => 'nullable|file|max:10240',
-        ]);
-
-        $task->status = $request->status;
-
-        if ($request->hasFile('attachment')) {
-            if ($task->attachment) {
-                \Storage::disk('public')->delete($task->attachment);
-            }
-            $task->attachment = $request->file('attachment')->store('attachments', 'public');
-        }
-    } else {
+    if ($user->role == 5) { // Admin/CEO role
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -92,13 +78,21 @@ class TaskController extends Controller
             'title', 'description', 'assigned_by', 'assigned_to', 
             'department_id', 'priority', 'status', 'deadline'
         ]));
+    } else { // All other roles (including employees)
+        $request->validate([
+            'status' => 'required|in:pending,in_progress,completed,on_hold',
+            'attachment' => 'nullable|file|max:10240',
+        ]);
 
-        if ($request->hasFile('attachment')) {
-            if ($task->attachment) {
-                \Storage::disk('public')->delete($task->attachment);
-            }
-            $task->attachment = $request->file('attachment')->store('attachments', 'public');
+        $task->status = $request->status;
+    }
+
+    // Handle attachment for all roles
+    if ($request->hasFile('attachment')) {
+        if ($task->attachment) {
+            \Storage::disk('public')->delete($task->attachment);
         }
+        $task->attachment = $request->file('attachment')->store('attachments', 'public');
     }
 
     $task->save();

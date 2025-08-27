@@ -4,7 +4,7 @@
 <div class="container mt-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="fw-bold text-primary">
-            <i class="fas fa-clock me-2"></i>Add Attendance
+            <i class="fas fa-sign-in-alt me-2"></i>Clock In
         </h2>
         <div>
             <a href="{{ route('callcenter.index') }}" class="btn btn-outline-primary">
@@ -12,6 +12,13 @@
             </a>
         </div>
     </div>
+
+    @if (session('info'))
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="fas fa-info-circle me-2"></i> {{ session('info') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -29,10 +36,15 @@
     <div class="row">
         <div class="col-lg-8">
             <div class="card shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 fw-bold">Attendance Information</h5>
+                <div class="card-header bg-success text-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-sign-in-alt me-2"></i>Clock In</h5>
                 </div>
                 <div class="card-body p-4">
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Welcome!</strong> Please clock in to start your workday. You'll need to edit this record to clock out when you finish work.
+                    </div>
+                    
                     <form action="{{ route('attendance.store') }}" method="POST">
                         @csrf
 
@@ -50,46 +62,25 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <div class="form-text">
-                                    <small>Select the date for this attendance record</small>
-                                </div>
                             </div>
                         </div>
 
                         <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="clock_in" class="form-label fw-medium">Clock In</label>
+                            <div class="col-md-12">
+                                <label for="clock_in" class="form-label fw-medium">Clock In Time <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light">
-                                        <i class="fas fa-sign-in-alt text-success"></i>
+                                        <i class="fas fa-clock text-success"></i>
                                     </span>
                                     <input type="time" id="clock_in" name="clock_in" 
-                                        value="{{ old('clock_in') }}" 
-                                        class="form-control @error('clock_in') is-invalid @enderror">
+                                        value="{{ old('clock_in', $currentTime) }}" 
+                                        class="form-control @error('clock_in') is-invalid @enderror" required>
                                     @error('clock_in')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="form-text">
-                                    <small>Time when you started work</small>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <label for="clock_out" class="form-label fw-medium">Clock Out</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light">
-                                        <i class="fas fa-sign-out-alt text-danger"></i>
-                                    </span>
-                                    <input type="time" id="clock_out" name="clock_out" 
-                                        value="{{ old('clock_out') }}" 
-                                        class="form-control @error('clock_out') is-invalid @enderror">
-                                    @error('clock_out')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="form-text">
-                                    <small>Time when you ended work</small>
+                                    <small>Current time is pre-filled, but you can adjust if needed</small>
                                 </div>
                             </div>
                         </div>
@@ -102,10 +93,10 @@
                                 </span>
                                 <select name="status" id="status" 
                                     class="form-select @error('status') is-invalid @enderror" required>
-                                    <option value="present" {{ old('status')=='present'?'selected':'' }}>Present</option>
-                                    <option value="absent" {{ old('status')=='absent'?'selected':'' }}>Absent</option>
+                                    <option value="present" {{ old('status','present')=='present'?'selected':'' }}>Present</option>
                                     <option value="late" {{ old('status')=='late'?'selected':'' }}>Late</option>
                                     <option value="leave" {{ old('status')=='leave'?'selected':'' }}>Leave</option>
+                                    <option value="absent" {{ old('status')=='absent'?'selected':'' }}>Absent</option>
                                 </select>
                                 @error('status')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -133,7 +124,7 @@
                                 <i class="fas fa-times me-1"></i> Cancel
                             </a>
                             <button type="submit" class="btn btn-success px-4">
-                                <i class="fas fa-save me-1"></i> Save Attendance
+                                <i class="fas fa-sign-in-alt me-1"></i> Clock In Now
                             </button>
                         </div>
                     </form>
@@ -149,11 +140,16 @@
                     </h5>
                 </div>
                 <div class="card-body">
+                    <div class="alert alert-warning mb-3">
+                        <h6 class="mb-2 fw-bold"><i class="fas fa-exclamation-triangle me-2"></i>Important</h6>
+                        <p class="mb-0">You'll need to edit this record at the end of your workday to clock out.</p>
+                    </div>
+                    
                     <div class="alert alert-info mb-0">
                         <h6 class="mb-2 fw-bold"><i class="fas fa-lightbulb me-2"></i>Tips</h6>
                         <ul class="mb-0 ps-3">
-                            <li>Clock In and Clock Out are optional for some statuses</li>
-                            <li>For "Absent" or "Leave" status, you don't need to enter times</li>
+                            <li>Clock In is required for "Present" and "Late" status</li>
+                            <li>Use "Leave" for approved time off</li>
                             <li>Use notes to explain unusual circumstances</li>
                         </ul>
                     </div>
@@ -170,11 +166,7 @@
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex align-items-center">
                             <span class="badge bg-success me-2">Present</span>
-                            <span>You attended work as scheduled</span>
-                        </li>
-                        <li class="list-group-item d-flex align-items-center">
-                            <span class="badge bg-danger me-2">Absent</span>
-                            <span>You did not attend work</span>
+                            <span>You arrived on time</span>
                         </li>
                         <li class="list-group-item d-flex align-items-center">
                             <span class="badge bg-warning text-dark me-2">Late</span>
@@ -184,6 +176,10 @@
                             <span class="badge bg-info me-2">Leave</span>
                             <span>Approved time off work</span>
                         </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <span class="badge bg-danger me-2">Absent</span>
+                            <span>You did not attend work</span>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -191,9 +187,7 @@
     </div>
 </div>
 
-{{-- Add Font Awesome if not already included in your layout --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <style>
 .card {
     border-radius: 8px;

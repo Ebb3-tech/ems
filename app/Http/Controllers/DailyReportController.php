@@ -57,10 +57,20 @@ class DailyReportController extends Controller
 
 
     // Show a single daily report
-    public function show(DailyReport $dailyReport)
+// Show a single daily report
+public function show(DailyReport $dailyReport)
 {
-    // Pass the report to the view
-    return view('daily-reports.show', ['report' => $dailyReport]);
+    // Get other reports by the same user
+    $userReports = DailyReport::where('user_id', $dailyReport->user_id)
+                             ->orderBy('report_date', 'desc')
+                             ->limit(10)  // Limit to most recent 10 reports
+                             ->get();
+    
+    // Pass the report and the user's other reports to the view
+    return view('daily-reports.show', [
+        'report' => $dailyReport,
+        'userReports' => $userReports
+    ]);
 }
 
    public function edit(DailyReport $dailyReport)

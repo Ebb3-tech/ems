@@ -4,7 +4,7 @@
 <div class="container mt-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="fw-bold text-primary">
-            <i class="fas fa-edit me-2"></i>Edit Attendance
+            <i class="fas fa-sign-out-alt me-2"></i>Clock Out
         </h2>
         <div>
             <a href="{{ route('attendance.index') }}" class="btn btn-outline-secondary">
@@ -29,96 +29,74 @@
     <div class="row">
         <div class="col-lg-8">
             <div class="card shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 fw-bold">Attendance Information</h5>
+                <div class="card-header bg-danger text-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-sign-out-alt me-2"></i>Clock Out</h5>
                 </div>
                 <div class="card-body p-4">
-                    <form action="{{ route('attendance.update', $attendance) }}" method="POST">
+                    @if($attendance->clock_out)
+                        <div class="alert alert-warning mb-4">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <strong>Note:</strong> You've already clocked out for this day. Editing will update your existing clock-out time.
+                        </div>
+                    @else
+                        <div class="alert alert-info mb-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Good job!</strong> Please record your clock-out time to complete your workday.
+                        </div>
+                    @endif
+                    
+                    <form action="{{ route('attendance.update', $attendance) }}" method="POST" id="clockOutForm">
                         @csrf
                         @method('PUT')
 
-                        <div class="row mb-3">
-                            <div class="col-md-12">
-                                <label for="date" class="form-label fw-medium">Date</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light">
-                                        <i class="far fa-calendar-alt text-primary"></i>
-                                    </span>
-                                    <input type="date" id="date" name="date" 
-                                        value="{{ old('date', $attendance->date->format('Y-m-d')) }}" 
-                                        class="form-control @error('date') is-invalid @enderror" required>
-                                    @error('date')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle mb-2 text-muted">Date</h6>
+                                        <p class="card-text h5">{{ $attendance->date->format('M d, Y') }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle mb-2 text-muted">Clock In Time</h6>
+                                        <p class="card-text h5">{{ \Carbon\Carbon::parse($attendance->clock_in)->format('H:i') }}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="clock_in" class="form-label fw-medium">Clock In</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light">
-                                        <i class="fas fa-sign-in-alt text-success"></i>
-                                    </span>
-                                    <input type="time" id="clock_in" name="clock_in" 
-                                        value="{{ old('clock_in', $attendance->clock_in) }}" 
-                                        class="form-control @error('clock_in') is-invalid @enderror">
-                                    @error('clock_in')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="form-text text-muted">
-                                    <small>Time when the employee started work</small>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <label for="clock_out" class="form-label fw-medium">Clock Out</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light">
-                                        <i class="fas fa-sign-out-alt text-danger"></i>
-                                    </span>
-                                    <input type="time" id="clock_out" name="clock_out" 
-                                        value="{{ old('clock_out', $attendance->clock_out) }}" 
-                                        class="form-control @error('clock_out') is-invalid @enderror">
-                                    @error('clock_out')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="form-text text-muted">
-                                    <small>Time when the employee ended work</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="status" class="form-label fw-medium">Status</label>
+                        
+                        <div class="mb-4">
+                            <label for="clock_out" class="form-label fw-bold">
+                                Clock Out Time <span class="text-danger">*</span>
+                            </label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light">
-                                    <i class="fas fa-user-clock text-primary"></i>
+                                    <i class="fas fa-sign-out-alt text-danger"></i>
                                 </span>
-                                <select name="status" id="status" 
-                                    class="form-select @error('status') is-invalid @enderror" required>
-                                    <option value="present" {{ old('status', $attendance->status) == 'present' ? 'selected' : '' }}>Present</option>
-                                    <option value="absent" {{ old('status', $attendance->status) == 'absent' ? 'selected' : '' }}>Absent</option>
-                                    <option value="late" {{ old('status', $attendance->status) == 'late' ? 'selected' : '' }}>Late</option>
-                                </select>
-                                @error('status')
+                                <input type="time" id="clock_out" name="clock_out" 
+                                    value="{{ old('clock_out', $attendance->clock_out ? \Carbon\Carbon::parse($attendance->clock_out)->format('H:i') : $currentTime) }}" 
+                                    class="form-control form-control-lg @error('clock_out') is-invalid @enderror" required>
+                                @error('clock_out')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                            </div>
+                            <div class="form-text text-muted">
+                                <small>Use 24-hour format (e.g., 13:30 for 1:30 PM)</small>
                             </div>
                         </div>
 
                         <div class="mb-4">
-                            <label for="notes" class="form-label fw-medium">Notes</label>
+                            <label for="notes" class="form-label fw-medium">Additional Notes</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light">
                                     <i class="fas fa-sticky-note text-muted"></i>
                                 </span>
                                 <textarea name="notes" id="notes" rows="3" 
                                     class="form-control @error('notes') is-invalid @enderror"
-                                    placeholder="Any additional information...">{{ old('notes', $attendance->notes) }}</textarea>
+                                    placeholder="Any additional information about your workday...">{{ old('notes', $attendance->notes) }}</textarea>
                                 @error('notes')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -129,8 +107,8 @@
                             <a href="{{ route('attendance.index') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-times me-1"></i> Cancel
                             </a>
-                            <button type="submit" class="btn btn-primary px-4">
-                                <i class="fas fa-save me-1"></i> Update Attendance
+                            <button type="submit" class="btn btn-danger btn-lg px-4" id="clockOutBtn">
+                                <i class="fas fa-sign-out-alt me-1"></i> Clock Out Now
                             </button>
                         </div>
                     </form>
@@ -140,19 +118,40 @@
         
         <div class="col-lg-4">
             <div class="card shadow-sm">
-                <div class="card-header bg-white py-3">
+                <div class="card-header bg-primary text-white py-3">
                     <h5 class="mb-0 fw-bold">
-                        <i class="fas fa-info-circle me-2"></i>Information
+                        <i class="fas fa-info-circle me-2"></i>Attendance Details
                     </h5>
                 </div>
                 <div class="card-body">
+                    <div class="alert alert-primary mb-3">
+                        <h6 class="mb-2 fw-bold"><i class="fas fa-user-clock me-2"></i>Status Information</h6>
+                        <p class="mb-0">
+                            <span class="badge bg-{{ 
+                                $attendance->status == 'present' ? 'success' : 
+                                ($attendance->status == 'late' ? 'warning' : 
+                                ($attendance->status == 'leave' ? 'info' : 'danger')) 
+                            }} p-2">
+                                {{ ucfirst($attendance->status) }}
+                            </span>
+                            @if($attendance->status == 'present')
+                                <span class="ms-2">On time attendance</span>
+                            @elseif($attendance->status == 'late')
+                                <span class="ms-2">Arrived after scheduled time</span>
+                            @elseif($attendance->status == 'leave')
+                                <span class="ms-2">Approved time off</span>
+                            @else
+                                <span class="ms-2">Not present</span>
+                            @endif
+                        </p>
+                    </div>
+                    
                     <div class="alert alert-info mb-0">
-                        <h6 class="mb-2 fw-bold"><i class="fas fa-lightbulb me-2"></i>Tips</h6>
-                        <ul class="mb-0 ps-3">
-                            <li>Both clock in and clock out times are optional for some statuses</li>
-                            <li>For "Absent" status, you don't need to enter times</li>
-                            <li>Use notes to explain unusual circumstances</li>
-                        </ul>
+                        <h6 class="mb-2 fw-bold"><i class="fas fa-lightbulb me-2"></i>Working Hours</h6>
+                        <div id="hours-calculation" class="text-center p-2 mb-2 border rounded bg-light">
+                            <div id="hours-result" class="h3 mb-0 text-primary">--:--</div>
+                        </div>
+                        <p class="small mb-0">Your working hours will be calculated based on your clock-in and clock-out times.</p>
                     </div>
                 </div>
             </div>
@@ -160,22 +159,22 @@
             <div class="card shadow-sm mt-3">
                 <div class="card-header bg-white py-3">
                     <h5 class="mb-0 fw-bold">
-                        <i class="fas fa-calendar-check me-2"></i>Status Guide
+                        <i class="fas fa-exclamation-triangle me-2 text-warning"></i>Important Notes
                     </h5>
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body">
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex align-items-center">
-                            <span class="badge bg-success me-2">Present</span>
-                            <span>Employee attended work as scheduled</span>
+                        <li class="list-group-item border-0 ps-0">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Your clock-in time is fixed and cannot be changed
                         </li>
-                        <li class="list-group-item d-flex align-items-center">
-                            <span class="badge bg-danger me-2">Absent</span>
-                            <span>Employee did not attend work</span>
+                        <li class="list-group-item border-0 ps-0">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Clock-out time must be after your clock-in time
                         </li>
-                        <li class="list-group-item d-flex align-items-center">
-                            <span class="badge bg-warning text-dark me-2">Late</span>
-                            <span>Employee arrived after scheduled time</span>
+                        <li class="list-group-item border-0 ps-0">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Working hours are automatically calculated
                         </li>
                     </ul>
                 </div>
@@ -184,14 +183,13 @@
     </div>
 </div>
 
-{{-- Add Font Awesome if not already included in your layout --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <style>
 .card {
     border-radius: 8px;
     overflow: hidden;
     transition: box-shadow 0.2s;
+    border: none;
 }
 .card:hover {
     box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
@@ -213,4 +211,67 @@
     border-radius: 0.375rem;
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const clockInTime = "{{ \Carbon\Carbon::parse($attendance->clock_in)->format('H:i') }}";
+    const clockOutInput = document.getElementById('clock_out');
+    const hoursResult = document.getElementById('hours-result');
+    const clockOutForm = document.getElementById('clockOutForm');
+    
+    function calculateHours() {
+        if (!clockInTime || !clockOutInput.value) {
+            hoursResult.textContent = '--:--';
+            return;
+        }
+        
+        // Parse times
+        const dateStr = "{{ $attendance->date->format('Y-m-d') }}";
+        let clockIn = new Date(`${dateStr}T${clockInTime}`);
+        let clockOut = new Date(`${dateStr}T${clockOutInput.value}`);
+        
+        // If clock out is earlier than clock in, assume it's next day
+        if (clockOut < clockIn) {
+            clockOut.setDate(clockOut.getDate() + 1);
+        }
+        
+        // Calculate difference in milliseconds
+        const diffMs = clockOut - clockIn;
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        
+        // Format result
+        hoursResult.textContent = `${diffHours}h ${diffMinutes}m`;
+        
+        // Add color coding
+        if (diffHours < 4) {
+            hoursResult.className = 'h3 mb-0 text-warning';
+        } else if (diffHours >= 8) {
+            hoursResult.className = 'h3 mb-0 text-success';
+        } else {
+            hoursResult.className = 'h3 mb-0 text-primary';
+        }
+        
+        return diffMs;
+    }
+    
+    // Calculate on page load
+    calculateHours();
+    
+    // Add event listeners
+    clockOutInput.addEventListener('change', calculateHours);
+    clockOutInput.addEventListener('input', calculateHours);
+    
+    // Validation to ensure clock-out is after clock-in
+    clockOutForm.addEventListener('submit', function(e) {
+        const diffMs = calculateHours();
+        
+        if (diffMs <= 0) {
+            e.preventDefault();
+            alert('Clock-out time must be after your clock-in time');
+            clockOutInput.classList.add('is-invalid');
+        } 
+    });
+});
+</script>
 @endsection

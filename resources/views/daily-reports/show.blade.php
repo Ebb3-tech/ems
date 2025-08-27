@@ -1,12 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-3">
-    {{-- Flash Message --}}
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
+
+<div class="container mt-3"> 
+    {{-- Flash Message --}} 
+    @if(session('success')) 
+    <div class="alert alert-success"> 
+        {{ session('success') }} 
+    </div> 
     @endif
 
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 gap-2">
@@ -73,7 +74,7 @@
                         </h6>
                         <div class="text-center bg-light rounded p-3">
                             <img src="{{ asset('storage/' . $report->image) }}" alt="Report Image" 
-                                 class="img-fluid rounded shadow-sm" style="max-height: 300px; max-width: 100%;">
+                                class="img-fluid rounded shadow-sm" style="max-height: 300px; max-width: 100%;">
                         </div>
                     </div>
                     @endif
@@ -85,7 +86,7 @@
                         <form action="{{ route('daily-reports.assignMarks', $report->id) }}" method="POST" class="d-flex flex-column flex-sm-row gap-2">
                             @csrf
                             <input type="number" name="marks" min="0" max="100" class="form-control" 
-                                   placeholder="Enter marks" value="{{ $report->marks ?? '' }}" required>
+                                placeholder="Enter marks" value="{{ $report->marks ?? '' }}" required>
                             <button type="submit" class="btn btn-success">Assign marks</button>
                         </form>
                     </div>
@@ -107,64 +108,53 @@
             </div>
         </div>
 
-        {{-- Report Details --}}
+        {{-- User's Other Reports --}}
         <div class="col-12 col-lg-4">
             <div class="card shadow-sm">
                 <div class="card-header bg-white py-3">
                     <h5 class="mb-0 fw-bold">
-                        <i class="fas fa-info-circle me-2"></i> Report Details
+                        <i class="fas fa-history me-2"></i> {{ $report->user->name }}'s Reports
                     </h5>
                 </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item px-0 py-3 d-flex">
-                            <div class="me-3">
-                                <span class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                    <i class="far fa-calendar-alt text-primary"></i>
-                                </span>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        @forelse($userReports as $userReport)
+                            <a href="{{ route('daily-reports.show', $userReport) }}" 
+                               class="list-group-item list-group-item-action d-flex align-items-center py-3 px-3 
+                                      {{ $userReport->id == $report->id ? 'active bg-primary text-white' : '' }}">
+                                <div class="me-3">
+                                    <span class="{{ $userReport->id == $report->id ? 'bg-white text-primary' : 'bg-light text-primary' }} rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                        <i class="far fa-file-alt"></i>
+                                    </span>
+                                </div>
+                                <div class="text-break flex-grow-1">
+                                    <div class="{{ $userReport->id == $report->id ? 'text-white-50' : 'text-muted' }} small">
+                                        {{ $userReport->report_date }}
+                                    </div>
+                                    <div class="fw-medium text-truncate" style="max-width: 180px;">
+                                        {{ \Illuminate\Support\Str::limit($userReport->content, 30) }}
+                                    </div>
+                                </div>
+                                @if($userReport->marks)
+                                    <span class="ms-2 badge {{ $userReport->id == $report->id ? 'bg-white text-primary' : 'bg-primary' }}">
+                                        {{ $userReport->marks }}/100
+                                    </span>
+                                @endif
+                            </a>
+                        @empty
+                            <div class="list-group-item py-3 px-3 text-center text-muted">
+                                <i class="fas fa-info-circle me-2"></i> No reports found
                             </div>
-                            <div class="text-break">
-                                <div class="text-muted small">Report Date</div>
-                                <div class="fw-medium">{{ $report->report_date }}</div>
-                            </div>
-                        </li>
-                        <li class="list-group-item px-0 py-3 d-flex">
-                            <div class="me-3">
-                                <span class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                    <i class="fas fa-user text-primary"></i>
-                                </span>
-                            </div>
-                            <div class="text-break">
-                                <div class="text-muted small">Employee</div>
-                                <div class="fw-medium">{{ $report->user->name }}</div>
-                            </div>
-                        </li>
-                        <li class="list-group-item px-0 py-3 d-flex">
-                            <div class="me-3">
-                                <span class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                    <i class="far fa-clock text-primary"></i>
-                                </span>
-                            </div>
-                            <div class="text-break">
-                                <div class="text-muted small">Created At</div>
-                                <div class="fw-medium">{{ $report->created_at->format('Y-m-d H:i') }}</div>
-                            </div>
-                        </li>
-                        @if($report->updated_at && $report->updated_at->ne($report->created_at))
-                        <li class="list-group-item px-0 py-3 d-flex">
-                            <div class="me-3">
-                                <span class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                    <i class="fas fa-edit text-primary"></i>
-                                </span>
-                            </div>
-                            <div class="text-break">
-                                <div class="text-muted small">Last Updated</div>
-                                <div class="fw-medium">{{ $report->updated_at->format('Y-m-d H:i') }}</div>
-                            </div>
-                        </li>
-                        @endif
-                    </ul>
+                        @endforelse
+                    </div>
                 </div>
+                @if(count($userReports) > 5)
+                    <div class="card-footer bg-white text-center py-2">
+                        <a href="{{ route('daily-reports.index', ['user_id' => $report->user_id]) }}" class="text-primary text-decoration-none">
+                            <i class="fas fa-list me-1"></i> View all reports
+                        </a>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -172,35 +162,41 @@
 
 {{-- Font Awesome --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <style>
-.card {
-    border-radius: 8px;
-    overflow: hidden;
-    transition: box-shadow 0.2s;
-    border: none;
-}
-.card:hover {
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
-}
-.list-group-item {
-    border-left: 0;
-    border-right: 0;
-    border-color: #f5f5f5;
-}
-.bg-light {
-    background-color: #f8f9fa !important;
-}
-.text-break {
-    word-wrap: break-word !important;
-    word-break: break-word !important;
-}
-@media (max-width: 768px) {
-    .btn-sm.btn-md-normal {
-        padding: .25rem .5rem;
-        font-size: .875rem;
+    .card {
+        border-radius: 8px;
+        overflow: hidden;
+        transition: box-shadow 0.2s;
+        border: none;
     }
-    
+    .card:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+    }
+    .list-group-item {
+        border-left: 0;
+        border-right: 0;
+        border-color: #f5f5f5;
+    }
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+    .text-break {
+        word-wrap: break-word !important;
+        word-break: break-word !important;
+    }
+    .list-group-item-action:hover {
+        background-color: #f8f9fa;
+        z-index: 1;
+    }
+    .list-group-item-action.active:hover {
+        background-color: var(--bs-primary);
+    }
+    @media (max-width: 768px) {
+        .btn-sm.btn-md-normal {
+            padding: .25rem .5rem;
+            font-size: .875rem;
+        }
+    }
     /* Make action buttons full width on very small screens */
     @media (max-width: 375px) {
         .d-flex.flex-wrap.gap-2 {
@@ -212,6 +208,5 @@
             text-align: center;
         }
     }
-}
 </style>
 @endsection

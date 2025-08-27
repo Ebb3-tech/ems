@@ -32,7 +32,7 @@
                         @csrf
                         @if(isset($task)) @method('PUT') @endif
 
-                        @if($authUser->role != 1) {{-- Employee role is 1 --}}
+                        @if($authUser->role == 5) {{-- Only role 5 (admin/CEO) can edit all fields --}}
                             <div class="mb-3">
                                 <label for="title" class="form-label fw-medium">Title <span class="text-danger">*</span></label>
                                 <div class="input-group">
@@ -156,6 +156,39 @@
                                 </div>
                                 <div class="form-text">
                                     <small>Set the target completion date and time</small>
+                                </div>
+                            </div>
+                        @else
+                            {{-- Show task information as read-only for non-admin users --}}
+                            <div class="alert alert-info mb-4">
+                                <h6 class="mb-2 fw-bold"><i class="fas fa-info-circle me-2"></i>Task Information</h6>
+                                <div class="row mb-2">
+                                    <div class="col-md-3 fw-bold">Title:</div>
+                                    <div class="col-md-9">{{ $task->title }}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-md-3 fw-bold">Description:</div>
+                                    <div class="col-md-9">{{ $task->description ?? 'No description provided' }}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-md-3 fw-bold">Assigned By:</div>
+                                    <div class="col-md-9">{{ $task->assignedBy->name ?? 'Not specified' }}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-md-3 fw-bold">Assigned To:</div>
+                                    <div class="col-md-9">{{ $task->assignedTo->name ?? 'Not assigned' }}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-md-3 fw-bold">Priority:</div>
+                                    <div class="col-md-9">
+                                        <span class="badge bg-{{ $task->priority == 'high' ? 'danger' : ($task->priority == 'medium' ? 'warning' : 'info') }}">
+                                            {{ ucfirst($task->priority) }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 fw-bold">Deadline:</div>
+                                    <div class="col-md-9">{{ $task->deadline ? $task->deadline->format('M d, Y g:i A') : 'No deadline' }}</div>
                                 </div>
                             </div>
                         @endif

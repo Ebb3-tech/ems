@@ -18,9 +18,11 @@
                     <li><a class="dropdown-item {{ request('status') == 'on_hold' ? 'active' : '' }}" href="{{ route('tasks.index', ['status' => 'on_hold']) }}">On Hold</a></li>
                 </ul>
             </div>
+            @if(Auth::user()->role == 5)
             <a href="{{ route('tasks.create') }}" class="btn btn-primary">
                 <i class="fas fa-plus-circle me-1"></i> Add Task
             </a>
+            @endif
         </div>
     </div>
 
@@ -246,6 +248,7 @@
                                                 <li><a class="dropdown-item" href="{{ route('tasks.show', $task) }}"><i class="fas fa-eye me-2 text-info"></i> View Details</a></li>
                                                 <li><a class="dropdown-item" href="{{ route('tasks.edit', $task) }}"><i class="fas fa-edit me-2 text-warning"></i> Edit Task</a></li>
                                                 <li><hr class="dropdown-divider"></li>
+                                                @if(Auth::user()->role == 5)
                                                 <li>
                                                     <form action="{{ route('tasks.destroy', $task) }}" method="POST" class="d-inline">
                                                         @csrf
@@ -256,6 +259,7 @@
                                                         </button>
                                                     </form>
                                                 </li>
+                                                @endif
                                             </ul>
                                         </div>
                                     </td>
@@ -270,9 +274,11 @@
                         <i class="fas fa-clipboard-check fa-3x text-muted"></i>
                     </div>
                     <p class="text-muted mb-3">You don't have any assigned tasks yet</p>
+                    @if(Auth::user()->role == 5)
                     <a href="{{ route('tasks.create') }}" class="btn btn-primary">
                         <i class="fas fa-plus-circle me-1"></i> Create New Task
                     </a>
+                    @endif
                 </div>
             @endif
         </div>
