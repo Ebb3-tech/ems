@@ -3,7 +3,14 @@
 @section('content')
 <div class="container mt-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="fw-bold text-primary"><i class="fas fa-tasks me-2"></i>My Tasks</h2>
+        <h2 class="fw-bold text-primary">
+            <i class="fas fa-tasks me-2"></i>
+            @if(Auth::user()->role == 5)
+                All Tasks
+            @else
+                My Tasks
+            @endif
+        </h2>
         <div class="d-flex gap-2">
             <div class="dropdown">
                 <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -27,10 +34,10 @@
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     @endif
 
     <!-- Task Summary Cards -->
@@ -44,12 +51,17 @@
                         </div>
                         <div>
                             <h6 class="text-muted mb-1">Total Tasks</h6>
-                            <h4 class="mb-0 fw-bold">{{ $tasks->where('assigned_to', Auth::id())->count() }}</h4>
+                            @if(Auth::user()->role == 5)
+                                <h4 class="mb-0 fw-bold">{{ $tasks->count() }}</h4>
+                            @else
+                                <h4 class="mb-0 fw-bold">{{ $tasks->where('assigned_to', Auth::id())->count() }}</h4>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        
         <div class="col-6 col-md-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
@@ -59,12 +71,17 @@
                         </div>
                         <div>
                             <h6 class="text-muted mb-1">In Progress</h6>
-                            <h4 class="mb-0 fw-bold">{{ $tasks->where('assigned_to', Auth::id())->where('status', 'in_progress')->count() }}</h4>
+                            @if(Auth::user()->role == 5)
+                                <h4 class="mb-0 fw-bold">{{ $tasks->where('status', 'in_progress')->count() }}</h4>
+                            @else
+                                <h4 class="mb-0 fw-bold">{{ $tasks->where('assigned_to', Auth::id())->where('status', 'in_progress')->count() }}</h4>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        
         <div class="col-6 col-md-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
@@ -74,12 +91,17 @@
                         </div>
                         <div>
                             <h6 class="text-muted mb-1">Completed</h6>
-                            <h4 class="mb-0 fw-bold">{{ $tasks->where('assigned_to', Auth::id())->where('status', 'completed')->count() }}</h4>
+                            @if(Auth::user()->role == 5)
+                                <h4 class="mb-0 fw-bold">{{ $tasks->where('status', 'completed')->count() }}</h4>
+                            @else
+                                <h4 class="mb-0 fw-bold">{{ $tasks->where('assigned_to', Auth::id())->where('status', 'completed')->count() }}</h4>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        
         <div class="col-6 col-md-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
@@ -89,7 +111,11 @@
                         </div>
                         <div>
                             <h6 class="text-muted mb-1">Overdue</h6>
-                            <h4 class="mb-0 fw-bold">{{ $tasks->where('assigned_to', Auth::id())->where('status', '!=', 'completed')->filter(function($task) { return $task->deadline && \Carbon\Carbon::parse($task->deadline)->isPast(); })->count() }}</h4>
+                            @if(Auth::user()->role == 5)
+                                <h4 class="mb-0 fw-bold">{{ $tasks->where('status', '!=', 'completed')->filter(function($task) { return $task->deadline && \Carbon\Carbon::parse($task->deadline)->isPast(); })->count() }}</h4>
+                            @else
+                                <h4 class="mb-0 fw-bold">{{ $tasks->where('assigned_to', Auth::id())->where('status', '!=', 'completed')->filter(function($task) { return $task->deadline && \Carbon\Carbon::parse($task->deadline)->isPast(); })->count() }}</h4>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -99,16 +125,33 @@
 
     <div class="card shadow-sm">
         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-bold">My Task List</h5>
-            <span class="badge bg-primary">{{ $tasks->where('assigned_to', Auth::id())->count() }} tasks</span>
+            <h5 class="mb-0 fw-bold">
+                @if(Auth::user()->role == 5)
+                    All Tasks
+                @else
+                    My Task List
+                @endif
+            </h5>
+            @if(Auth::user()->role == 5)
+                <span class="badge bg-primary">{{ $tasks->count() }} tasks</span>
+            @else
+                <span class="badge bg-primary">{{ $tasks->where('assigned_to', Auth::id())->count() }} tasks</span>
+            @endif
         </div>
         <div class="card-body p-0">
-            @if($tasks->where('assigned_to', Auth::id())->count() > 0)
+            @php
+                $displayTasks = Auth::user()->role == 5 ? $tasks : $tasks->where('assigned_to', Auth::id());
+            @endphp
+            
+            @if($displayTasks->count() > 0)
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
                                 <th class="ps-3">Title</th>
+                                @if(Auth::user()->role == 5)
+                                    <th>Assigned To</th>
+                                @endif
                                 <th>Assigned By</th>
                                 <th>Priority</th>
                                 <th>Status</th>
@@ -117,45 +160,61 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($tasks->where('assigned_to', Auth::id())->sortByDesc('created_at') as $task)
-                                <tr>
-                                    <td class="ps-3 fw-medium">
-                                        <i class="fas fa-clipboard-list text-primary me-1"></i> {{ $task->title }}
-                                    </td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 28px; height: 28px;">
-                                                <i class="fas fa-user text-primary"></i>
-                                            </div>
-                                            <span>{{ $task->assignedBy?->name }}</span>
+                            @foreach($displayTasks->sortByDesc('created_at') as $task)
+                            <tr>
+                                <td class="ps-3 fw-medium">
+                                    <i class="fas fa-clipboard-list text-primary me-1"></i>
+                                    {{ $task->title }}
+                                </td>
+                                
+                                @if(Auth::user()->role == 5)
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 28px; height: 28px;">
+                                            <i class="fas fa-user text-primary"></i>
                                         </div>
-                                    </td>
-                                    <td>
+                                        <span>{{ $task->assignedTo?->name ?? 'Unassigned' }}</span>
+                                    </div>
+                                </td>
+                                @endif
+                                
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 28px; height: 28px;">
+                                            <i class="fas fa-user text-primary"></i>
+                                        </div>
+                                        <span>{{ $task->assignedBy?->name }}</span>
+                                    </div>
+                                </td>
+                                
+                                <td>
+                                    @php
+                                        $priorityClass = [
+                                            'high' => 'danger',
+                                            'medium' => 'warning',
+                                            'low' => 'info'
+                                        ][$task->priority] ?? 'secondary';
+                                    @endphp
+                                    <span class="badge bg-{{ $priorityClass }}">
+                                        {{ ucfirst($task->priority) }}
+                                    </span>
+                                </td>
+                                
+                                <td>
+                                    <div class="dropdown">
                                         @php
-                                            $priorityClass = [
-                                                'high' => 'danger',
-                                                'medium' => 'warning',
-                                                'low' => 'info'
-                                            ][$task->priority] ?? 'secondary';
+                                            $statusClass = [
+                                                'not_started' => 'secondary',
+                                                'in_progress' => 'warning',
+                                                'completed' => 'success',
+                                                'on_hold' => 'info',
+                                                'cancelled' => 'danger'
+                                            ][$task->status] ?? 'secondary';
+
+                                            $statusText = ucfirst(str_replace('_', ' ', $task->status));
                                         @endphp
-                                        <span class="badge bg-{{ $priorityClass }}">
-                                            {{ ucfirst($task->priority) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="dropdown">
-                                            @php
-                                                $statusClass = [
-                                                    'not_started' => 'secondary',
-                                                    'in_progress' => 'warning',
-                                                    'completed' => 'success',
-                                                    'on_hold' => 'info',
-                                                    'cancelled' => 'danger'
-                                                ][$task->status] ?? 'secondary';
-                                                
-                                                $statusText = ucfirst(str_replace('_', ' ', $task->status));
-                                            @endphp
-                                            
+                                        
+                                        @if(Auth::user()->role == 5 || $task->assigned_to == Auth::id())
                                             <button class="btn btn-sm badge bg-{{ $statusClass }} dropdown-toggle border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                 {{ $statusText }}
                                             </button>
@@ -190,65 +249,74 @@
                                                     </form>
                                                 </li>
                                             </ul>
+                                        @else
+                                            <span class="badge bg-{{ $statusClass }}">{{ $statusText }}</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                
+                                <td>
+                                    @if($task->deadline)
+                                        <div class="d-flex align-items-center">
+                                            <i class="far fa-calendar-alt text-muted me-1"></i> 
+                                            {{ $task->deadline->format('Y-m-d') }}
+                                            <div class="small text-muted ms-1">{{ $task->deadline->format('H:i') }}</div>
                                         </div>
-                                    </td>
-                                    <td>
-                                        @if($task->deadline)
-                                            <div class="d-flex align-items-center">
-                                                <i class="far fa-calendar-alt text-muted me-1"></i> 
-                                                {{ $task->deadline->format('Y-m-d') }}
-                                                <div class="small text-muted ms-1">{{ $task->deadline->format('H:i') }}</div>
-                                            </div>
-                                            
-                                            @if($task->status != 'completed')
-                                                @php
-                                                    $now = \Carbon\Carbon::now();
-                                                    $deadline = \Carbon\Carbon::parse($task->deadline);
-                                                    $isPast = $now->gt($deadline);
-                                                    
-                                                    if ($isPast) {
-                                                        $diff = $now->diff($deadline);
-                                                    } else {
-                                                        $diff = $deadline->diff($now);
-                                                    }
-                                                    
-                                                    $timeLeft = [];
-                                                    if ($diff->d > 0) $timeLeft[] = $diff->d . ' day' . ($diff->d > 1 ? 's' : '');
-                                                    if ($diff->h > 0) $timeLeft[] = $diff->h . ' hour' . ($diff->h > 1 ? 's' : '');
-                                                    if ($diff->i > 0) $timeLeft[] = $diff->i . ' min' . ($diff->i > 1 ? 's' : '');
-                                                    
-                                                    $timeLeftText = implode(', ', $timeLeft);
-                                                    if (empty($timeLeft)) $timeLeftText = 'less than a minute';
-                                                @endphp
+                                        
+                                        @if($task->status != 'completed')
+                                            @php
+                                                $now = \Carbon\Carbon::now();
+                                                $deadline = \Carbon\Carbon::parse($task->deadline);
+                                                $isPast = $now->gt($deadline);
                                                 
-                                                @if($isPast)
-                                                    <small class="text-danger">
-                                                        <i class="fas fa-exclamation-circle me-1"></i> Overdue by {{ $timeLeftText }}
-                                                    </small>
-                                                @else
-                                                    <small class="{{ $diff->d <= 2 ? 'text-warning' : 'text-muted' }}">
-                                                        <i class="fas fa-hourglass-half me-1"></i> {{ $timeLeftText }} left
-                                                    </small>
-                                                @endif
+                                                if ($isPast) {
+                                                    $diff = $now->diff($deadline);
+                                                } else {
+                                                    $diff = $deadline->diff($now);
+                                                }
+                                                
+                                                $timeLeft = [];
+                                                if ($diff->d > 0) $timeLeft[] = $diff->d . ' day' . ($diff->d > 1 ? 's' : '');
+                                                if ($diff->h > 0) $timeLeft[] = $diff->h . ' hour' . ($diff->h > 1 ? 's' : '');
+                                                if ($diff->i > 0) $timeLeft[] = $diff->i . ' min' . ($diff->i > 1 ? 's' : '');
+                                                
+                                                $timeLeftText = implode(', ', $timeLeft);
+                                                if (empty($timeLeft)) $timeLeftText = 'less than a minute';
+                                            @endphp
+                                            
+                                            @if($isPast)
+                                                <small class="text-danger">
+                                                    <i class="fas fa-exclamation-circle me-1"></i> Overdue by {{ $timeLeftText }}
+                                                </small>
                                             @else
-                                                <small class="text-success">
-                                                    <i class="fas fa-check-circle me-1"></i> Completed
+                                                <small class="{{ $diff->d <= 2 ? 'text-warning' : 'text-muted' }}">
+                                                    <i class="fas fa-hourglass-half me-1"></i> {{ $timeLeftText }} left
                                                 </small>
                                             @endif
                                         @else
-                                            <span class="text-muted">N/A</span>
+                                            <small class="text-success">
+                                                <i class="fas fa-check-circle me-1"></i> Completed
+                                            </small>
                                         @endif
-                                    </td>
-                                    <td class="text-end pe-3">
-                                        <div class="dropdown">
-                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="fas fa-ellipsis-v"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                <li><a class="dropdown-item" href="{{ route('tasks.show', $task) }}"><i class="fas fa-eye me-2 text-info"></i> View Details</a></li>
+                                    @else
+                                        <span class="text-muted">N/A</span>
+                                    @endif
+                                </td>
+                                
+                                <td class="text-end pe-3">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item" href="{{ route('tasks.show', $task) }}"><i class="fas fa-eye me-2 text-info"></i> View Details</a></li>
+                                            
+                                            @if(Auth::user()->role == 5 || $task->assigned_to == Auth::id())
                                                 <li><a class="dropdown-item" href="{{ route('tasks.edit', $task) }}"><i class="fas fa-edit me-2 text-warning"></i> Edit Task</a></li>
+                                            @endif
+                                            
+                                            @if(Auth::user()->role == 5)
                                                 <li><hr class="dropdown-divider"></li>
-                                                @if(Auth::user()->role == 5)
                                                 <li>
                                                     <form action="{{ route('tasks.destroy', $task) }}" method="POST" class="d-inline">
                                                         @csrf
@@ -259,11 +327,11 @@
                                                         </button>
                                                     </form>
                                                 </li>
-                                                @endif
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
+                                            @endif
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -273,11 +341,13 @@
                     <div class="mb-3">
                         <i class="fas fa-clipboard-check fa-3x text-muted"></i>
                     </div>
-                    <p class="text-muted mb-3">You don't have any assigned tasks yet</p>
                     @if(Auth::user()->role == 5)
-                    <a href="{{ route('tasks.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus-circle me-1"></i> Create New Task
-                    </a>
+                        <p class="text-muted mb-3">No tasks found in the system</p>
+                        <a href="{{ route('tasks.create') }}" class="btn btn-primary">
+                            <i class="fas fa-plus-circle me-1"></i> Create First Task
+                        </a>
+                    @else
+                        <p class="text-muted mb-3">You don't have any assigned tasks yet</p>
                     @endif
                 </div>
             @endif
@@ -289,41 +359,49 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-.table th, .table td {
-    padding: 0.75rem 1rem;
-}
-.card {
-    border-radius: 8px;
-    overflow: hidden;
-    transition: box-shadow 0.2s;
-    border: none;
-}
-.card:hover {
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
-}
-.badge {
-    font-weight: 500;
-    padding: 0.4em 0.6em;
-}
-.rounded-circle {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.dropdown-toggle::after {
-    margin-left: 0.5em;
-}
-.dropdown-item.active, .dropdown-item:active {
-    background-color: #f8f9fa;
-    color: #212529;
-}
-.dropdown-item:hover {
-    background-color: rgba(0,0,0,0.05);
-}
-.dropdown-item {
-    padding: 0.5rem 1rem;
-}
+    .table th, .table td {
+        padding: 0.75rem 1rem;
+    }
+    
+    .card {
+        border-radius: 8px;
+        overflow: hidden;
+        transition: box-shadow 0.2s;
+        border: none;
+    }
+    
+    .card:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+    }
+    
+    .badge {
+        font-weight: 500;
+        padding: 0.4em 0.6em;
+    }
+    
+    .rounded-circle {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .dropdown-toggle::after {
+        margin-left: 0.5em;
+    }
+    
+    .dropdown-item.active, .dropdown-item:active {
+        background-color: #f8f9fa;
+        color: #212529;
+    }
+    
+    .dropdown-item:hover {
+        background-color: rgba(0,0,0,0.05);
+    }
+    
+    .dropdown-item {
+        padding: 0.5rem 1rem;
+    }
 </style>
 @endsection
