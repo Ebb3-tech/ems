@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use App\Models\User;
 use App\Models\Department;
+use App\Notifications\TaskNotification;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -55,7 +56,12 @@ class TaskController extends Controller
             $taskData['attachment'] = $request->file('attachment')->store('attachments', 'public');
         }
 
-        Task::create($taskData);
+        $task = Task::create($taskData);
+
+        // Send notification to assigned user if task is assigned
+        if ($task->assigned_to && $task->assignedTo) {
+            $task->assignedTo->notify(new TaskNotification($task, 'created', auth()->user()));
+        }
 
         return redirect()->route('tasks.index')->with('success', 'Task created successfully.');
     }
@@ -70,6 +76,8 @@ class TaskController extends Controller
     public function update(Request $request, Task $task)
     {
         $user = auth()->user();
+        $originalAssignedTo = $task->assigned_to;
+        $originalStatus = $task->status;
 
         if ($user->role == 5) { // Admin/CEO role
             $request->validate([
@@ -107,6 +115,9 @@ class TaskController extends Controller
 
         $task->save();
 
+        // Send notifications after saving
+        $this->sendTaskUpdateNotifications($task, $originalAssignedTo, $originalStatus, $user);
+
         return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
     }
 
@@ -127,12 +138,43 @@ class TaskController extends Controller
 
     public function updateStatus(Request $request, Task $task)
     {
+        $originalStatus = $task->status;
+        
         $request->validate([
             'status' => 'required|in:not_started,in_progress,completed,on_hold,cancelled',
         ]);
 
         $task->update(['status' => $request->status]);
 
+        // Send notification if status changed and task is assigned
+        if ($originalStatus !== $request->status && $task->assigned_to && $task->assignedTo) {
+            $task->assignedTo->notify(new TaskNotification($task, 'status_updated', auth()->user()));
+        }
+
         return redirect()->back()->with('success', 'Task status updated successfully!');
+    }
+
+    /**
+     * Handle notifications for task updates
+     */
+    private function sendTaskUpdateNotifications($task, $originalAssignedTo, $originalStatus, $actionBy)
+    {
+        // If task was reassigned to a different user
+        if ($originalAssignedTo !== $task->assigned_to) {
+            // Notify new assignee if task is now assigned to someone
+            if ($task->assigned_to && $task->assignedTo) {
+                $task->assignedTo->notify(new TaskNotification($task, 'created', $actionBy));
+            }
+        } else {
+            // Task updated for same user
+            if ($task->assigned_to && $task->assignedTo) {
+                // Check if it's just a status update or full update
+                $action = ($originalStatus !== $task->status && $actionBy->id !== $task->assigned_to) 
+                    ? 'status_updated' 
+                    : 'updated';
+                    
+                $task->assignedTo->notify(new TaskNotification($task, $action, $actionBy));
+            }
+        }
     }
 }
