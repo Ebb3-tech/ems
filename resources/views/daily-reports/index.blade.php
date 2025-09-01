@@ -153,18 +153,18 @@
                 </div>
                 
                 <div class="p-3">
-                    @if ($reports->hasPages())
-    <nav aria-label="Page Navigation">
-        <ul class="pagination justify-content-center">
-            @foreach ($reports->getUrlRange(1, $reports->lastPage()) as $page => $url)
-                <li class="page-item {{ $page == $reports->currentPage() ? 'active' : '' }}">
-                    <a class="page-link" href="{{ $url }}">{{ $page }}</a>
-                </li>
-            @endforeach
-        </ul>
-    </nav>
-@endif
-                </div>
+    @if ($reports->hasPages())
+        <nav aria-label="Page Navigation">
+            <ul class="pagination justify-content-center">
+                @for ($i = 1; $i <= $reports->lastPage(); $i++)
+                    <li class="page-item {{ $i == $reports->currentPage() ? 'active' : '' }}">
+                        <a class="page-link" href="{{ $reports->url($i) }}">{{ $i }}</a>
+                    </li>
+                @endfor
+            </ul>
+        </nav>
+    @endif
+</div>
             @else
                 <div class="text-center py-5">
                     <div class="mb-3">
@@ -231,6 +231,7 @@
 .pagination {
     justify-content: center;
     flex-wrap: wrap;
+    gap: 5px;
 }
 .page-item.active .page-link {
     background-color: #0d6efd;
@@ -238,6 +239,8 @@
 }
 .page-link {
     color: #0d6efd;
+    min-width: 36px;
+    text-align: center;
 }
 .page-link:hover {
     color: #0a58ca;
