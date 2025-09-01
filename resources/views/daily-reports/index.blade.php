@@ -277,5 +277,11 @@
     font-size: 0.75rem;
     padding: 0.3rem 0.5rem;
 }
+
+/* Hide pagination arrows */
+.pagination .page-item:first-child,
+.pagination .page-item:last-child {
+    display: none;
+}
 </style>
 @endsection
