@@ -322,4 +322,45 @@ nav[aria-label="pagination"] .page-item:last-child,
     }
 }
 </style>
+</div>
+
+<script>
+// JavaScript solution to remove pagination arrows after page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Remove all pagination arrows using JavaScript
+    const paginationItems = document.querySelectorAll('.pagination .page-item');
+    
+    paginationItems.forEach(function(item) {
+        const link = item.querySelector('.page-link');
+        if (link) {
+            // Check for various arrow symbols and attributes
+            const linkText = link.textContent.trim();
+            const ariaLabel = link.getAttribute('aria-label');
+            const rel = link.getAttribute('rel');
+            
+            // Remove items containing arrows or navigation text
+            if (linkText === '‹' || linkText === '›' || 
+                linkText === '«' || linkText === '»' || 
+                linkText === '<' || linkText === '>' ||
+                linkText === 'Previous' || linkText === 'Next' ||
+                (ariaLabel && (ariaLabel.includes('Previous') || ariaLabel.includes('Next'))) ||
+                rel === 'prev' || rel === 'next') {
+                item.style.display = 'none';
+                item.remove();
+            }
+        }
+    });
+    
+    // Also remove first and last items as backup
+    const pagination = document.querySelector('.pagination');
+    if (pagination) {
+        const firstItem = pagination.querySelector('.page-item:first-child');
+        const lastItem = pagination.querySelector('.page-item:last-child');
+        
+        if (firstItem) firstItem.remove();
+        if (lastItem && lastItem !== firstItem) lastItem.remove();
+    }
+});
+</script>
+
 @endsection
