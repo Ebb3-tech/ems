@@ -217,20 +217,22 @@
     }
 }
 
-/* Pagination styling */
-.pagination {
-    justify-content: center;
-    flex-wrap: wrap;
+/* Replace arrows with text */
+.pagination .page-item:first-child .page-link {
+    font-size: 0;
 }
-.page-item.active .page-link {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
+.pagination .page-item:first-child .page-link::after {
+    content: 'Prev';
+    font-size: 0.875rem;
 }
-.page-link {
-    color: #0d6efd;
+
+.pagination .page-item:last-child .page-link {
+    font-size: 0;
 }
-.page-link:hover {
-    color: #0a58ca;
+.pagination .page-item:last-child .page-link::after {
+    content: 'Next';
+    font-size: 0.875rem;
+}color: #0a58ca;
 }
 
 /* Responsive button sizing */
