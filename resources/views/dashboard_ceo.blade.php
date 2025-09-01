@@ -103,9 +103,11 @@
                         <i class="fas fa-calendar-alt opacity-50 d-sm-none"></i>
                     </div>
                     <div class="mt-2">
-                        <a href="" class="btn btn-sm btn-light">
-                            <i class="fas fa-cog me-1"></i> <span class="d-none d-sm-inline">Manage</span>
-                        </a>
+                        <a href="{{ route('leave-requests.index') }}" class="btn btn-sm btn-light">
+    <i class="fas fa-cog me-1"></i>
+    <span class="d-none d-sm-inline">Manage</span>
+</a>
+
                     </div>
                 </div>
             </div>

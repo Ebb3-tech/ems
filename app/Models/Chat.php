@@ -9,7 +9,10 @@ class Chat extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['sender_id', 'receiver_id', 'message', 'is_read'];
+    protected $fillable = [
+        'sender_id', 'receiver_id', 'message', 'is_read', 
+        'file_path', 'file_type'
+    ];
 
     public function sender() {
         return $this->belongsTo(User::class, 'sender_id');
@@ -18,5 +21,11 @@ class Chat extends Model
     public function receiver() {
         return $this->belongsTo(User::class, 'receiver_id');
     }
+
+    public function getFileUrlAttribute()
+    {
+        return $this->file_path ? asset('storage/' . $this->file_path) : null;
+    }
 }
+
 

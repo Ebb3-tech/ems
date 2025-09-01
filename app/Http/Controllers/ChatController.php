@@ -50,20 +50,40 @@ class ChatController extends Controller
    public function send(Request $request)
 {
     $request->validate([
-        'receiver_id' => 'required|exists:users,id',
-        'message' => 'required|string',
-    ]);
+    'receiver_id' => 'required|exists:users,id',
+    'message' => 'nullable|string',
+    'file' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp3,wav,m4a,webm|max:10240',
+]);
+
+
+    $filePath = null;
+    $fileType = null;
+
+    if ($request->hasFile('file')) {
+    $filePath = $request->file('file')->store('chat_files', 'public');
+
+    // Detect file type
+    if (in_array($request->file('file')->extension(), ['jpg','jpeg','png','gif'])) {
+        $fileType = 'image';
+    } elseif (in_array($request->file('file')->extension(), ['mp3','wav','m4a','webm'])) {
+        $fileType = 'audio';
+    }
+}
+
 
     $chat = Chat::create([
         'sender_id' => auth()->id(),
         'receiver_id' => $request->receiver_id,
-        'message' => $request->message,
+        'message' => $request->message ?? null,
+        'file_path' => $filePath,
+        'file_type' => $fileType,
     ]);
 
     broadcast(new MessageSent($chat));
 
     return redirect()->route('chat.index', ['receiver_id' => $request->receiver_id]);
 }
+
 
 
 }

@@ -614,37 +614,79 @@
             <!-- Chat Messages -->
             <div id="chat-box" class="messages-container">
                 @foreach($messages as $msg)
-                    <div class="message">
-                        @if($msg->sender_id == auth()->id())
-                            <div class="message-right">
-                                {{ $msg->message }}
-                                <div class="message-time">
-                                    {{ $msg->created_at->format('g:i A') }}
-                                </div>
-                            </div>
-                        @else
-                            <div class="message-left">
-                                {{ $msg->message }}
-                                <div class="message-time">
-                                    {{ $msg->created_at->format('g:i A') }}
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                @endforeach
+    <div class="message">
+        @if($msg->sender_id == auth()->id())
+            <div class="message-right">
+                @if($msg->message)
+                    <p>{{ $msg->message }}</p>
+                @endif
+
+                @if($msg->file_type == 'image')
+                    <img src="{{ $msg->file_url }}" style="max-width:200px; border-radius:10px;">
+                @elseif($msg->file_type == 'audio')
+                    <audio controls>
+                        <source src="{{ $msg->file_url }}" type="audio/webm">
+                        Your browser does not support the audio element.
+                    </audio>
+                @endif
+
+                <div class="message-time">
+                    {{ $msg->created_at->format('g:i A') }}
+                </div>
+            </div>
+        @else
+            <div class="message-left">
+                @if($msg->message)
+                    <p>{{ $msg->message }}</p>
+                @endif
+
+                @if($msg->file_type == 'image')
+                    <img src="{{ $msg->file_url }}" style="max-width:200px; border-radius:10px;">
+                @elseif($msg->file_type == 'audio')
+                    <audio controls>
+                        <source src="{{ $msg->file_url }}" type="audio/webm">
+                        Your browser does not support the audio element.
+                    </audio>
+                @endif
+
+                <div class="message-time">
+                    {{ $msg->created_at->format('g:i A') }}
+                </div>
+            </div>
+        @endif
+    </div>
+@endforeach
+
             </div>
 
             <!-- Message Form -->
-            <form action="{{ route('chat.send') }}" method="POST" class="message-form">
-                @csrf
-                <input type="hidden" name="receiver_id" value="{{ $receiverId }}">
-                <input type="text" name="message" class="message-input" placeholder="Type your message..." required>
-                <button type="submit" class="send-button">
-                    <svg class="send-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                    </svg>
-                </button>
-            </form>
+            <form action="{{ route('chat.send') }}" method="POST" class="message-form" enctype="multipart/form-data" id="chat-form">
+    @csrf
+    <input type="hidden" name="receiver_id" value="{{ $receiverId }}">
+    <input type="text" name="message" class="message-input" placeholder="Type your message...">
+
+    <!-- Hidden file input -->
+    <input type="file" name="file" id="file-input" style="display:none;" accept="image/*,audio/*">
+
+    <!-- File upload button -->
+    <button type="button" id="file-btn" class="send-button" style="background-color: var(--secondary);">
+        📎
+    </button>
+
+    <!-- Mic button -->
+    <button type="button" id="record-btn" class="send-button" style="background-color: green;">
+        🎤
+    </button>
+
+    <!-- Send button -->
+    <button type="submit" class="send-button">
+        <svg class="send-icon" viewBox="0 0 24 24">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+    </button>
+</form>
+
+
         @else
             <div class="chat-header">
                 <div class="chat-header-left">
@@ -671,6 +713,68 @@
 <div class="copyright">
     © Ebenezer 2025. All Rights Reserved.
 </div>
+
+
+<script>
+let mediaRecorder;
+let audioChunks = [];
+let isRecording = false;
+
+const recordBtn = document.getElementById('record-btn');
+const fileBtn = document.getElementById('file-btn');
+const fileInput = document.getElementById('file-input');
+const chatForm = document.getElementById('chat-form');
+
+// 📎 Open file selector when button clicked
+fileBtn.addEventListener('click', () => {
+    fileInput.click();
+});
+
+// 🎤 Recording logic
+recordBtn.addEventListener('click', async () => {
+    if (!isRecording) {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.start();
+            audioChunks = [];
+
+            mediaRecorder.addEventListener("dataavailable", event => {
+                audioChunks.push(event.data);
+            });
+
+            mediaRecorder.addEventListener("stop", () => {
+                const audioBlob = new Blob(audioChunks, { type: "audio/webm; codecs=opus" });
+                const file = new File([audioBlob], "voice_note.webm", { type: "audio/webm" });
+
+                const formData = new FormData(chatForm);
+                formData.append("file", file);
+
+                fetch(chatForm.action, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                }).then(() => {
+                    window.location.reload(); // reload to show new message
+                });
+            });
+
+            recordBtn.textContent = "⏹"; // Change to stop
+            isRecording = true;
+        } catch (err) {
+            alert("Microphone access denied!");
+        }
+    } else {
+        mediaRecorder.stop();
+        recordBtn.textContent = "🎤";
+        isRecording = false;
+    }
+});
+</script>
+
+
 
 <script>
     const userId = {{ auth()->id() }};

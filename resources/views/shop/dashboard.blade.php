@@ -18,6 +18,10 @@
             <a href="{{ route('attendance.create') }}" class="btn btn-sm btn-warning me-1 mb-1 mb-md-0">
                 <i class="fas fa-clock me-1"></i> Attendance
             </a>
+            <a href="{{ route('leave-requests.index') }}" class="btn btn-sm btn-info text-white">
+    <i class="fas fa-calendar-alt me-1"></i> Leave Requests
+</a>
+
             <a href="{{ route('daily-reports.index') }}" class="btn btn-sm btn-info text-white">
                 <i class="fas fa-file-alt me-1"></i> Report
             </a>
