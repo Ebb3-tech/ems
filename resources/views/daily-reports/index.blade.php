@@ -256,5 +256,26 @@
         text-align: center;
     }
 }
+
+/* Make pagination arrows smaller */
+.pagination .page-link {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+}
+
+/* Even smaller on mobile */
+@media (max-width: 767.98px) {
+    .pagination .page-link {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.4rem;
+    }
+}
+
+/* Target specifically the prev/next arrows if needed */
+.pagination .page-item:first-child .page-link,
+.pagination .page-item:last-child .page-link {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.5rem;
+}
 </style>
 @endsection
