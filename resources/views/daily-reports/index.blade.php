@@ -233,22 +233,69 @@
     color: #0a58ca;
 }
 
-/* HIDE PAGINATION ARROWS - This removes the < and > symbols */
+/* COMPLETELY HIDE ALL PAGINATION ARROWS - Multiple methods to ensure removal */
+
+/* Method 1: Hide first and last pagination items */
 .pagination .page-item:first-child,
 .pagination .page-item:last-child {
     display: none !important;
 }
 
-/* Alternative method - if the above doesn't work, use this instead */
+/* Method 2: Hide by rel attributes */
 .pagination .page-item .page-link[rel="prev"],
 .pagination .page-item .page-link[rel="next"] {
     display: none !important;
 }
 
-/* Hide any arrow symbols in pagination */
+/* Method 3: Hide by aria-label attributes */
+.pagination .page-item .page-link[aria-label*="Previous"],
+.pagination .page-item .page-link[aria-label*="Next"] {
+    display: none !important;
+}
+
+/* Method 4: Hide by content - covers Bootstrap default arrows */
+.pagination .page-item .page-link:contains("‹"),
+.pagination .page-item .page-link:contains("›"),
+.pagination .page-item .page-link:contains("«"),
+.pagination .page-item .page-link:contains("»"),
+.pagination .page-item .page-link:contains("<"),
+.pagination .page-item .page-link:contains(">") {
+    display: none !important;
+}
+
+/* Method 5: Target Bootstrap's default Previous/Next classes */
+.pagination .page-item:has(.page-link[aria-label*="Previous"]),
+.pagination .page-item:has(.page-link[aria-label*="Next"]) {
+    display: none !important;
+}
+
+/* Method 6: Hide any pseudo-elements that might contain arrows */
 .pagination .page-link::before,
 .pagination .page-link::after {
     content: none !important;
+    display: none !important;
+}
+
+/* Method 7: Override Bootstrap's pagination arrows with empty content */
+.pagination .page-item:first-child .page-link::before,
+.pagination .page-item:last-child .page-link::after,
+.pagination .page-item:first-child .page-link,
+.pagination .page-item:last-child .page-link {
+    font-size: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    visibility: hidden !important;
+}
+
+/* Method 8: Force hide by targeting common pagination structures */
+nav[aria-label="pagination"] .page-item:first-child,
+nav[aria-label="pagination"] .page-item:last-child,
+.pagination-wrapper .page-item:first-child,
+.pagination-wrapper .page-item:last-child {
+    display: none !important;
 }
 
 /* Responsive button sizing */
