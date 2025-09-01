@@ -217,22 +217,38 @@
     }
 }
 
-/* Replace arrows with text */
-.pagination .page-item:first-child .page-link {
-    font-size: 0;
+/* Pagination styling */
+.pagination {
+    justify-content: center;
+    flex-wrap: wrap;
 }
-.pagination .page-item:first-child .page-link::after {
-    content: 'Prev';
-    font-size: 0.875rem;
+.page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+.page-link {
+    color: #0d6efd;
+}
+.page-link:hover {
+    color: #0a58ca;
 }
 
-.pagination .page-item:last-child .page-link {
-    font-size: 0;
+/* HIDE PAGINATION ARROWS - This removes the < and > symbols */
+.pagination .page-item:first-child,
+.pagination .page-item:last-child {
+    display: none !important;
 }
-.pagination .page-item:last-child .page-link::after {
-    content: 'Next';
-    font-size: 0.875rem;
-}color: #0a58ca;
+
+/* Alternative method - if the above doesn't work, use this instead */
+.pagination .page-item .page-link[rel="prev"],
+.pagination .page-item .page-link[rel="next"] {
+    display: none !important;
+}
+
+/* Hide any arrow symbols in pagination */
+.pagination .page-link::before,
+.pagination .page-link::after {
+    content: none !important;
 }
 
 /* Responsive button sizing */
