@@ -153,7 +153,17 @@
                 </div>
                 
                 <div class="p-3">
-                    {{ $reports->links() }}
+                    @if ($reports->hasPages())
+    <nav aria-label="Page Navigation">
+        <ul class="pagination justify-content-center">
+            @foreach ($reports->getUrlRange(1, $reports->lastPage()) as $page => $url)
+                <li class="page-item {{ $page == $reports->currentPage() ? 'active' : '' }}">
+                    <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                </li>
+            @endforeach
+        </ul>
+    </nav>
+@endif
                 </div>
             @else
                 <div class="text-center py-5">
