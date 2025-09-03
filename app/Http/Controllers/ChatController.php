@@ -52,8 +52,9 @@ class ChatController extends Controller
     $request->validate([
     'receiver_id' => 'required|exists:users,id',
     'message' => 'nullable|string',
-    'file' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp3,wav,m4a,webm|max:10240',
+    'file' => 'nullable|file|max:20480', // 20MB max
 ]);
+
 
 
     $filePath = null;
@@ -61,14 +62,23 @@ class ChatController extends Controller
 
     if ($request->hasFile('file')) {
     $filePath = $request->file('file')->store('chat_files', 'public');
+    $extension = strtolower($request->file('file')->extension());
 
-    // Detect file type
-    if (in_array($request->file('file')->extension(), ['jpg','jpeg','png','gif'])) {
+    if (in_array($extension, ['jpg','jpeg','png','gif'])) {
         $fileType = 'image';
-    } elseif (in_array($request->file('file')->extension(), ['mp3','wav','m4a','webm'])) {
+    } elseif (in_array($extension, ['mp3','wav','m4a','webm'])) {
         $fileType = 'audio';
+    } elseif (in_array($extension, ['pdf'])) {
+        $fileType = 'pdf';
+    } elseif (in_array($extension, ['doc','docx'])) {
+        $fileType = 'word';
+    } elseif (in_array($extension, ['xls','xlsx'])) {
+        $fileType = 'excel';
+    } else {
+        $fileType = 'file'; // fallback for other types
     }
 }
+
 
 
     $chat = Chat::create([

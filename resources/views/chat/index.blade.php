@@ -615,76 +615,75 @@
             <div id="chat-box" class="messages-container">
                 @foreach($messages as $msg)
     <div class="message">
-        @if($msg->sender_id == auth()->id())
-            <div class="message-right">
-                @if($msg->message)
-                    <p>{{ $msg->message }}</p>
-                @endif
+    @if($msg->sender_id == auth()->id())
+        <div class="message-right">
+            @if($msg->message)
+                <p>{{ $msg->message }}</p>
+            @endif
 
+            @if($msg->file_type && $msg->file_path)
                 @if($msg->file_type == 'image')
-                    <img src="{{ $msg->file_url }}" style="max-width:200px; border-radius:10px;">
+                    <img src="{{ asset('storage/' . $msg->file_path) }}" style="max-width:200px; border-radius:10px;">
                 @elseif($msg->file_type == 'audio')
                     <audio controls>
-                        <source src="{{ $msg->file_url }}" type="audio/webm">
+                        <source src="{{ asset('storage/' . $msg->file_path) }}" type="audio/webm">
                         Your browser does not support the audio element.
                     </audio>
+                @elseif($msg->file_type == 'pdf')
+                    <a href="{{ asset('storage/' . $msg->file_path) }}" target="_blank">View PDF</a>
                 @endif
+            @endif
 
-                <div class="message-time">
-                    {{ $msg->created_at->format('g:i A') }}
-                </div>
-            </div>
-        @else
-            <div class="message-left">
-                @if($msg->message)
-                    <p>{{ $msg->message }}</p>
-                @endif
+            <div class="message-time">{{ $msg->created_at->format('g:i A') }}</div>
+        </div>
+    @else
+        <div class="message-left">
+            @if($msg->message)
+                <p>{{ $msg->message }}</p>
+            @endif
 
+            @if($msg->file_type && $msg->file_path)
                 @if($msg->file_type == 'image')
-                    <img src="{{ $msg->file_url }}" style="max-width:200px; border-radius:10px;">
+                    <img src="{{ asset('storage/' . $msg->file_path) }}" style="max-width:200px; border-radius:10px;">
                 @elseif($msg->file_type == 'audio')
                     <audio controls>
-                        <source src="{{ $msg->file_url }}" type="audio/webm">
+                        <source src="{{ asset('storage/' . $msg->file_path) }}" type="audio/webm">
                         Your browser does not support the audio element.
                     </audio>
+                @elseif($msg->file_type == 'pdf')
+                    <a href="{{ asset('storage/' . $msg->file_path) }}" target="_blank" style="color: red;">>View PDF</a>
                 @endif
+            @endif
 
-                <div class="message-time">
-                    {{ $msg->created_at->format('g:i A') }}
-                </div>
-            </div>
-        @endif
-    </div>
+            <div class="message-time">{{ $msg->created_at->format('g:i A') }}</div>
+        </div>
+    @endif
+</div>
+
 @endforeach
 
             </div>
 
             <!-- Message Form -->
-            <form action="{{ route('chat.send') }}" method="POST" class="message-form" enctype="multipart/form-data" id="chat-form">
+            <form id="chat-form" action="{{ route('chat.send') }}" method="POST" enctype="multipart/form-data">
     @csrf
     <input type="hidden" name="receiver_id" value="{{ $receiverId }}">
-    <input type="text" name="message" class="message-input" placeholder="Type your message...">
 
-    <!-- Hidden file input -->
-    <input type="file" name="file" id="file-input" style="display:none;" accept="image/*,audio/*">
+    <div class="mb-2 d-flex align-items-center gap-1">
+        <input name="message" class="form-control" rows="1" placeholder="Type your message...">
 
-    <!-- File upload button -->
-    <button type="button" id="file-btn" class="send-button" style="background-color: var(--secondary);">
-        📎
-    </button>
+        <!-- File upload button -->
+        <button type="button" id="file-btn" class="btn btn-light">📎</button>
+        <input type="file" id="file-input" name="file" hidden>
 
-    <!-- Mic button -->
-    <button type="button" id="record-btn" class="send-button" style="background-color: green;">
-        🎤
-    </button>
+        <!-- Mic / record button -->
+        <button type="button" id="record-btn" class="btn btn-light">🎤</button>
 
-    <!-- Send button -->
-    <button type="submit" class="send-button">
-        <svg class="send-icon" viewBox="0 0 24 24">
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-        </svg>
-    </button>
+        <!-- Send -->
+        <button type="submit" class="btn btn-primary">Send</button>
+    </div>
 </form>
+
 
 
         @else
@@ -860,50 +859,66 @@ recordBtn.addEventListener('click', async () => {
     const currentReceiverId = urlParams.get('receiver_id');
 
     window.Echo.private('chat.' + userId)
-        .listen('MessageSent', (e) => {
-            if(!chatBox) return;
-            
-            // Add the message to the chat if it's from current conversation
-            if(e.chat.sender_id === {{ auth()->id() }} || e.chat.receiver_id === {{ auth()->id() }}) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'message';
-                
-                const messageContent = document.createElement('div');
-                const isCurrentUser = e.chat.sender_id === userId;
-                
-                if(isCurrentUser) {
-                    messageContent.className = 'message-right';
+    .listen('MessageSent', (e) => {
+        if(!chatBox) return;
+
+        // Only add messages for current conversation
+        if(e.chat.sender_id === userId || e.chat.receiver_id === userId) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+
+            const messageContent = document.createElement('div');
+            const isCurrentUser = e.chat.sender_id === userId;
+
+            messageContent.className = isCurrentUser ? 'message-right' : 'message-left';
+
+            // Format message content
+            let contentHTML = '';
+
+            // Add text message
+            if(e.chat.message) {
+                contentHTML += `<p>${e.chat.message}</p>`;
+            }
+
+            // Add file if exists
+            if(e.chat.file_type) {
+                if(e.chat.file_type === 'image') {
+                    contentHTML += `<img src="${e.chat.file_url}" style="max-width:200px; border-radius:10px;">`;
+                } else if(e.chat.file_type === 'audio') {
+                    contentHTML += `<audio controls>
+                        <source src="${e.chat.file_url}" type="audio/webm">
+                        Your browser does not support the audio element.
+                    </audio>`;
                 } else {
-                    messageContent.className = 'message-left';
-                }
-                
-                // Format time
-                const now = new Date();
-                const hours = now.getHours() % 12 || 12;
-                const minutes = now.getMinutes().toString().padStart(2, '0');
-                const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
-                const timeFormatted = `${hours}:${minutes} ${ampm}`;
-                
-                messageContent.innerHTML = `
-                    ${e.chat.message}
-                    <div class="message-time">${timeFormatted}</div>
-                `;
-                
-                messageDiv.appendChild(messageContent);
-                chatBox.appendChild(messageDiv);
-                chatBox.scrollTop = chatBox.scrollHeight;
-                
-                // If we're currently viewing messages from this sender,
-                // mark them as read
-                if (currentReceiverId && currentReceiverId == e.chat.sender_id) {
-                    markMessagesAsRead(e.chat.sender_id);
-                } else {
-                    // Otherwise update unread counts
-                    updateUnreadCounts();
+                    // For PDFs or other files
+                    contentHTML += `<a href="${e.chat.file_url}" target="_blank">Download ${e.chat.file_type}</a>`;
                 }
             }
-        });
-        
+
+            // Add message time
+            const msgDate = new Date(e.chat.created_at);
+            const hours = msgDate.getHours() % 12 || 12;
+            const minutes = msgDate.getMinutes().toString().padStart(2, '0');
+            const ampm = msgDate.getHours() >= 12 ? 'PM' : 'AM';
+            const timeFormatted = `${hours}:${minutes} ${ampm}`;
+
+            contentHTML += `<div class="message-time">${timeFormatted}</div>`;
+
+            messageContent.innerHTML = contentHTML;
+            messageDiv.appendChild(messageContent);
+
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Mark as read if current conversation
+            if (currentReceiverId && currentReceiverId == e.chat.sender_id) {
+                markMessagesAsRead(e.chat.sender_id);
+            } else {
+                updateUnreadCounts();
+            }
+        }
+    });
+ 
     // Function to mark messages as read
     function markMessagesAsRead(senderId) {
         fetch('/chat/mark-read-from-sender', {

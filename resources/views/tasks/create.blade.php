@@ -78,23 +78,24 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="assigned_to" class="form-label fw-medium">Assigned To</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light">
-                                <i class="fas fa-user-check text-primary"></i>
-                            </span>
-                            <select id="assigned_to" name="assigned_to" 
-                                class="form-select @error('assigned_to') is-invalid @enderror">
-                                <option value="">Select assignee</option>
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}" @selected(old('assigned_to', $task->assigned_to ?? '') == $user->id)>{{ $user->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('assigned_to')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
+    <label for="assigned_to" class="form-label fw-medium">Assigned To</label>
+    <div class="input-group">
+        <span class="input-group-text bg-light">
+            <i class="fas fa-user-check text-primary"></i>
+        </span>
+        <select id="assigned_to" name="assigned_to[]" 
+            class="form-select @error('assigned_to') is-invalid @enderror" multiple>
+            @foreach($users as $user)
+                <option value="{{ $user->id }}">{{ $user->name }}</option>
+            @endforeach
+        </select>
+        @error('assigned_to')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+    <small class="text-muted">Hold CTRL (Windows) or CMD (Mac) to select multiple users.</small>
+</div>
+
                 </div>
 
                 <div class="row">

@@ -34,37 +34,41 @@ class TaskController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'assigned_by' => 'required|exists:users,id',
-            'assigned_to' => 'nullable|exists:users,id',
-            'department_id' => 'nullable|exists:departments,id',
-            'priority' => 'required|in:low,medium,high',
-            'status' => 'required|in:pending,in_progress,completed,on_hold',
-            'deadline' => 'nullable|date',
-            'attachment' => 'nullable|file|max:10240', // 10MB max
-        ]);
+{
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'assigned_by' => 'required|exists:users,id',
+        'assigned_to' => 'required|array|min:1',   // multiple users
+        'assigned_to.*' => 'exists:users,id',
+        'department_id' => 'nullable|exists:departments,id',
+        'priority' => 'required|in:low,medium,high',
+        'status' => 'required|in:pending,in_progress,completed,on_hold',
+        'deadline' => 'nullable|date',
+        'attachment' => 'nullable|file|max:10240',
+    ]);
 
-        $taskData = $request->only([
-            'title', 'description', 'assigned_by', 'assigned_to', 
-            'department_id', 'priority', 'status', 'deadline'
-        ]);
+    $taskData = $request->only([
+        'title', 'description', 'assigned_by', 
+        'department_id', 'priority', 'status', 'deadline'
+    ]);
 
-        if ($request->hasFile('attachment')) {
-            $taskData['attachment'] = $request->file('attachment')->store('attachments', 'public');
-        }
+    if ($request->hasFile('attachment')) {
+        $taskData['attachment'] = $request->file('attachment')->store('attachments', 'public');
+    }
 
+    foreach ($request->assigned_to as $userId) {
+        $taskData['assigned_to'] = $userId;
         $task = Task::create($taskData);
 
-        // Send notification to assigned user if task is assigned
-        if ($task->assigned_to && $task->assignedTo) {
+        // notify each assignee
+        if ($task->assignedTo) {
             $task->assignedTo->notify(new TaskNotification($task, 'created', auth()->user()));
         }
-
-        return redirect()->route('tasks.index')->with('success', 'Task created successfully.');
     }
+
+    return redirect()->route('tasks.index')->with('success', 'Task assigned to multiple users successfully.');
+}
 
     public function edit(Task $task)
     {
