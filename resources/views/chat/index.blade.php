@@ -613,56 +613,55 @@
 
             <!-- Chat Messages -->
             <div id="chat-box" class="messages-container">
-                @foreach($messages as $msg)
+@foreach($messages as $msg)
     <div class="message">
-    @if($msg->sender_id == auth()->id())
-        <div class="message-right">
-            @if($msg->message)
-                <p>{{ $msg->message }}</p>
-            @endif
-
-            @if($msg->file_type && $msg->file_path)
-                @if($msg->file_type == 'image')
-                    <img src="{{ asset('storage/' . $msg->file_path) }}" style="max-width:200px; border-radius:10px;">
-                @elseif($msg->file_type == 'audio')
-                    <audio controls>
-                        <source src="{{ asset('storage/' . $msg->file_path) }}" type="audio/webm">
-                        Your browser does not support the audio element.
-                    </audio>
-                @elseif($msg->file_type == 'pdf')
-                    <a href="{{ asset('storage/' . $msg->file_path) }}" target="_blank">View PDF</a>
+        @if($msg->sender_id == auth()->id())
+            <div class="message-right">
+                @if($msg->message)
+                    <p>{{ $msg->message }}</p>
                 @endif
-            @endif
 
-            <div class="message-time">{{ $msg->created_at->format('g:i A') }}</div>
-        </div>
-    @else
-        <div class="message-left">
-            @if($msg->message)
-                <p>{{ $msg->message }}</p>
-            @endif
-
-            @if($msg->file_type && $msg->file_path)
-                @if($msg->file_type == 'image')
-                    <img src="{{ asset('storage/' . $msg->file_path) }}" style="max-width:200px; border-radius:10px;">
-                @elseif($msg->file_type == 'audio')
-                    <audio controls>
-                        <source src="{{ asset('storage/' . $msg->file_path) }}" type="audio/webm">
-                        Your browser does not support the audio element.
-                    </audio>
-                @elseif($msg->file_type == 'pdf')
-                    <a href="{{ asset('storage/' . $msg->file_path) }}" target="_blank" style="color: red;">>View PDF</a>
+                @if($msg->file_type && $msg->file_path)
+                    @if($msg->file_type == 'image')
+                        <img src="{{ asset('storage/' . $msg->file_path) }}" style="max-width:200px; border-radius:10px;">
+                    @elseif($msg->file_type == 'audio')
+                        <audio controls>
+                            <source src="{{ asset('storage/' . $msg->file_path) }}" type="audio/webm">
+                            Your browser does not support the audio element.
+                        </audio>
+                    @elseif($msg->file_type == 'pdf' || $msg->file_type == 'file')
+                        <a href="{{ asset('storage/' . $msg->file_path) }}" target="_blank">View File</a>
+                    @endif
                 @endif
-            @endif
 
-            <div class="message-time">{{ $msg->created_at->format('g:i A') }}</div>
-        </div>
-    @endif
+                <div class="message-time">{{ $msg->created_at->format('g:i A') }}</div>
+            </div>
+        @else
+            <div class="message-left">
+                @if($msg->message)
+                    <p>{{ $msg->message }}</p>
+                @endif
+
+                @if($msg->file_type && $msg->file_path)
+                    @if($msg->file_type == 'image')
+                        <img src="{{ asset('storage/' . $msg->file_path) }}" style="max-width:200px; border-radius:10px;">
+                    @elseif($msg->file_type == 'audio')
+                        <audio controls>
+                            <source src="{{ asset('storage/' . $msg->file_path) }}" type="audio/webm">
+                            Your browser does not support the audio element.
+                        </audio>
+                    @elseif($msg->file_type == 'pdf' || $msg->file_type == 'file')
+                        <a href="{{ asset('storage/' . $msg->file_path) }}" target="_blank">View File</a>
+                    @endif
+                @endif
+
+                <div class="message-time">{{ $msg->created_at->format('g:i A') }}</div>
+            </div>
+        @endif
+    </div>
+@endforeach
 </div>
 
-@endforeach
-
-            </div>
 
             <!-- Message Form -->
             <form id="chat-form" action="{{ route('chat.send') }}" method="POST" enctype="multipart/form-data">
