@@ -2,6 +2,8 @@
 
 @section('content')
 <div class="container-fluid container-md mt-3 d-flex flex-column min-vh-100">
+
+    {{-- Header --}}
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
         <h2 class="fw-bold text-primary mb-2 mb-md-0">CEO Dashboard</h2>
         <div class="d-flex flex-wrap gap-2">
@@ -27,8 +29,9 @@
 
     {{-- Main Stats Cards --}}
     <div class="row g-3 mb-4">
+
         {{-- Departments --}}
-        <div class="col-6 col-md-3">
+        <div class="col-6 col-md-2">
             <div class="card border-0 rounded-3 shadow-sm h-100">
                 <div class="card-body bg-primary text-white rounded-3 py-2">
                     <div class="d-flex justify-content-between align-items-center">
@@ -49,7 +52,7 @@
         </div>
 
         {{-- Employees --}}
-        <div class="col-6 col-md-3">
+        <div class="col-6 col-md-2">
             <div class="card border-0 rounded-3 shadow-sm h-100">
                 <div class="card-body bg-success text-white rounded-3 py-2">
                     <div class="d-flex justify-content-between align-items-center">
@@ -70,7 +73,7 @@
         </div>
 
         {{-- Tasks --}}
-        <div class="col-6 col-md-3">
+        <div class="col-6 col-md-2">
             <div class="card border-0 rounded-3 shadow-sm h-100">
                 <div class="card-body bg-warning text-dark rounded-3 py-2">
                     <div class="d-flex justify-content-between align-items-center">
@@ -91,7 +94,7 @@
         </div>
 
         {{-- Leave Requests --}}
-        <div class="col-6 col-md-3">
+        <div class="col-6 col-md-2">
             <div class="card border-0 rounded-3 shadow-sm h-100">
                 <div class="card-body bg-danger text-white rounded-3 py-2">
                     <div class="d-flex justify-content-between align-items-center">
@@ -104,39 +107,58 @@
                     </div>
                     <div class="mt-2">
                         <a href="{{ route('leave-requests.index') }}" class="btn btn-sm btn-light">
-    <i class="fas fa-cog me-1"></i>
-    <span class="d-none d-sm-inline">Manage</span>
-</a>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-3">
-        {{-- Customer Requests --}}
-        <div class="col-12 col-md-3">
-            <div class="card border-0 rounded-3 shadow-sm">
-                <div class="card-body bg-info text-white rounded-3 py-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-0 small">Customer Requests</h6>
-                            <h3 class="mb-0 fw-bold" id="total-requests">{{ \App\Models\CustomerRequest::count() }}</h3>
-                        </div>
-                        <i class="fas fa-headset fa-2x opacity-50 d-none d-sm-block"></i>
-                        <i class="fas fa-headset opacity-50 d-sm-none"></i>
-                    </div>
-                    <div class="mt-2">
-                        <a href="{{ route('callcenter.index') }}" class="btn btn-sm btn-light">
-                            <i class="fas fa-phone-alt me-1"></i> <span class="d-none d-sm-inline">Call Center</span>
+                            <i class="fas fa-cog me-1"></i> <span class="d-none d-sm-inline">Manage</span>
                         </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- Daily Activities --}}
+        {{-- Sales --}}
+        <div class="col-6 col-md-2">
+            <div class="card border-0 rounded-3 shadow-sm h-100">
+                <div class="card-body bg-success text-white rounded-3 py-2 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0 small">Sales</h6>
+                        </div>
+                        <i class="fas fa-chart-line fa-2x opacity-50 d-none d-sm-block"></i>
+                        <i class="fas fa-chart-line opacity-50 d-sm-none"></i>
+                    </div>
+                    <div class="mt-2">
+                        <a href="{{ route('shop.dashboard') }}" class="btn btn-sm btn-light d-flex align-items-center gap-1">
+                            <i class="fas fa-eye"></i> <span class="d-none d-sm-inline">View Shop</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Customer Requests --}}
+        <div class="col-6 col-md-2">
+            <div class="card border-0 rounded-3 shadow-sm h-100">
+                <div class="card-body bg-info text-white rounded-3 py-2 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0 small">Customer Requests</h6>
+                            <h3 class="mb-0 fw-bold">{{ \App\Models\CustomerRequest::count() }}</h3>
+                        </div>
+                        <i class="fas fa-headset fa-2x opacity-50 d-none d-sm-block"></i>
+                        <i class="fas fa-headset opacity-50 d-sm-none"></i>
+                    </div>
+                    <div class="mt-2">
+                        <a href="{{ route('callcenter.index') }}" class="btn btn-sm btn-light d-flex align-items-center gap-1">
+                            <i class="fas fa-phone-alt"></i> <span class="d-none d-sm-inline">Call Center</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div> {{-- End Main Stats Cards --}}
+
+    {{-- Daily Activities --}}
+    <div class="row g-3">
         <div class="col-12 col-md-9">
             <div class="card border-0 rounded-3 shadow-sm h-100">
                 <div class="card-header bg-white py-2 border-0">
@@ -144,9 +166,10 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
+                        {{-- Daily Reports --}}
                         <div class="col-12 col-sm-6 col-md-4">
                             <div class="card bg-light border-0 h-100">
-                                <div class="card-body py-2">
+                                <div class="card-body py-2 d-flex flex-column justify-content-between">
                                     <div class="d-flex align-items-center">
                                         <div class="rounded-circle bg-primary p-2 me-3 text-white">
                                             <i class="fas fa-file-alt"></i>
@@ -164,9 +187,11 @@
                                 </div>
                             </div>
                         </div>
+
+                        {{-- Attendance --}}
                         <div class="col-12 col-sm-6 col-md-4">
                             <div class="card bg-light border-0 h-100">
-                                <div class="card-body py-2">
+                                <div class="card-body py-2 d-flex flex-column justify-content-between">
                                     <div class="d-flex align-items-center">
                                         <div class="rounded-circle bg-warning p-2 me-3 text-white">
                                             <i class="fas fa-clock"></i>
@@ -184,9 +209,11 @@
                                 </div>
                             </div>
                         </div>
+
+                        {{-- Notifications --}}
                         <div class="col-12 col-sm-6 col-md-4">
                             <div class="card bg-light border-0 h-100">
-                                <div class="card-body py-2">
+                                <div class="card-body py-2 d-flex flex-column justify-content-between">
                                     <div class="d-flex align-items-center">
                                         <div class="rounded-circle bg-secondary p-2 me-3 text-white">
                                             <i class="fas fa-bell"></i>
@@ -204,23 +231,26 @@
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </div> {{-- End Daily Activities --}}
 
-    {{-- Copyright Footer - push to bottom with margin-top:auto --}}
+    {{-- Footer --}}
     <div class="mt-auto py-3 text-center border-top">
         <p class="text-muted mb-0">
             <i class="far fa-copyright me-1"></i> 2025 Designed by Ebenezer. All Rights Reserved.
         </p>
     </div>
-</div>
 
-{{-- Add Font Awesome if not already included in your layout --}}
+</div> {{-- End container-fluid --}}
+
+{{-- Font Awesome --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+{{-- Custom Styles --}}
 <style>
 .card {
     overflow: hidden;
@@ -236,7 +266,6 @@
     align-items: center;
     justify-content: center;
 }
-
 @media (max-width: 576px) {
     .rounded-circle {
         width: 30px;

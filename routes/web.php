@@ -208,26 +208,30 @@ Route::middleware('auth')->group(function () {
     });
 
     // Shop Routes
-    Route::prefix('shop')->name('shop.')->group(function() {
+   Route::prefix('shop')->name('shop.')->group(function() {
 
-        Route::get('/dashboard', function() {
-            $user = auth()->user();
-            if ($user->role != 4) return redirectToAllowedDashboard($user);
+    Route::get('/dashboard', function() {
+        $user = auth()->user();
 
-            return view('shop.dashboard', [
-                'vendorsCount' => Vendor::count(),
-                'productsCount' => Product::count(),
-                'walkInCustomersCount' => WalkInCustomer::count(),
-            ]);
-        })->name('dashboard');
+        // Allow role 4 (shop) and role 5 (CEO)
+        if (!in_array($user->role, [4, 5])) {
+            return redirectToAllowedDashboard($user);
+        }
 
-        Route::resource('vendors', VendorController::class);
-        Route::resource('products', ProductController::class);
+        return view('shop.dashboard', [
+            'vendorsCount' => Vendor::count(),
+            'productsCount' => Product::count(),
+            'walkInCustomersCount' => WalkInCustomer::count(),
+        ]);
+    })->name('dashboard');
 
-        Route::get('customers/create', [ShopCustomerController::class, 'create'])->name('customers.create');
-        Route::post('customers', [ShopCustomerController::class, 'store'])->name('customers.store');
-        Route::get('customers/{customer}', [ShopCustomerController::class, 'show'])->name('customers.show');
-         Route::resource('walk-in-customers', WalkInCustomerController::class)->names([
+    Route::resource('vendors', VendorController::class);
+    Route::resource('products', ProductController::class);
+
+    Route::get('customers/create', [ShopCustomerController::class, 'create'])->name('customers.create');
+    Route::post('customers', [ShopCustomerController::class, 'store'])->name('customers.store');
+    Route::get('customers/{customer}', [ShopCustomerController::class, 'show'])->name('customers.show');
+    Route::resource('walk-in-customers', WalkInCustomerController::class)->names([
         'index'   => 'walk-in-customers.index',
         'create'  => 'walk-in-customers.create',
         'store'   => 'walk-in-customers.store',
@@ -237,7 +241,8 @@ Route::middleware('auth')->group(function () {
         'destroy' => 'walk-in-customers.destroy',
     ]);
 
-    });
+});
+
 });
 
 // Redirect root

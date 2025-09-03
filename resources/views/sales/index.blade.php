@@ -8,7 +8,7 @@
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                 <div class="d-flex align-items-center mb-3 mb-md-0">
                     <div class="bg-primary p-2 rounded me-3 text-white">
-                        <i class="fas fa-dollar-sign"></i>
+                        
                     </div>
                     <h2 class="h4 mb-0 fw-bold">Sales Overview</h2>
                 </div>
