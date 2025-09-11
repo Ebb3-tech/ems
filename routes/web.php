@@ -206,6 +206,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/callcenter/tasks/{task}/status', [CallCenterController::class, 'updateTaskStatus'])
             ->name('callcenter.tasks.update-status');
     });
+    Route::get('/clients/search', [SaleController::class, 'searchClient']);
 
     // Shop Routes
    Route::prefix('shop')->name('shop.')->group(function() {

@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::table('chats', function (Blueprint $table) {
             $table->string('file_type')->nullable()->change();
-            $table->string('file_path')->nullable()->change(); // 👈 also good to make path nullable
+            $table->string('file_path')->nullable()->change(); 
         });
     }
 

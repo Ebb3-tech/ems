@@ -54,7 +54,7 @@
                                 </td>
                                 <td>
                                     <span class="badge bg-success">
-                                        <i class="fas fa-tag me-1"></i> ${{ $product->price ?? '0.00' }}
+                                        <i class="fas fa-tag me-1"></i> Frw{{ $product->price ?? '0.00' }}
                                     </span>
                                 </td>
                                 <td>

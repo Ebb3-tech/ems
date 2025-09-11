@@ -34,29 +34,28 @@
                                     <i class="fas fa-user me-2"></i>Client Information
                                 </h6>
                                 
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-medium">Client Name</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-white">
-                                                <i class="fas fa-user-tag text-muted"></i>
-                                            </span>
-                                            <input type="text" name="client_name" class="form-control" 
-                                                   value="{{ old('client_name') }}" required>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-medium">Client Phone</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-white">
-                                                <i class="fas fa-phone text-muted"></i>
-                                            </span>
-                                            <input type="text" name="client_phone" class="form-control" 
-                                                   value="{{ old('client_phone') }}" required>
-                                        </div>
-                                    </div>
-                                </div>
+                                <div class="col-md-6">
+    <label class="form-label fw-medium">Client Name</label>
+    <div class="input-group">
+        <span class="input-group-text bg-white">
+            <i class="fas fa-user-tag text-muted"></i>
+        </span>
+        <input type="text" id="clientNameInput" name="client_name" class="form-control"
+               value="{{ old('client_name') }}" placeholder="Start typing client name..." required>
+    </div>
+</div>
+
+<div class="col-md-6">
+    <label class="form-label fw-medium">Client Phone</label>
+    <div class="input-group">
+        <span class="input-group-text bg-white">
+            <i class="fas fa-phone text-muted"></i>
+        </span>
+        <input type="text" id="clientPhoneInput" name="client_phone" class="form-control"
+               value="{{ old('client_phone') }}" required>
+    </div>
+</div>
+
                             </div>
                         </div>
                         
@@ -114,64 +113,82 @@
                             </div>
                         </div>
                         
-                        <div class="card mb-4 border-0 bg-light">
-                            <div class="card-body">
-                                <h6 class="card-title text-primary mb-3">
-                                    <i class="fas fa-dollar-sign me-2"></i>Financial Details
-                                </h6>
-                                
-                                <div class="row g-3">
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-medium">Vendor Price</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-white">$</span>
-                                            <input type="number" step="0.01" name="vendor_price" class="form-control" 
-                                                   value="{{ old('vendor_price') }}" required>
-                                        </div>
-                                        <div class="form-text">Amount paid to vendor</div>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-medium">Additional Expenses</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-white">$</span>
-                                            <input type="number" step="0.01" name="expenses" class="form-control"
-                                                   value="{{ old('expenses', '0.00') }}">
-                                        </div>
-                                        <div class="form-text">Other costs (shipping, etc.)</div>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-medium">Sale Price</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-white">$</span>
-                                            <input type="number" step="0.01" name="sale_price" class="form-control"
-                                                   value="{{ old('sale_price') }}" required>
-                                        </div>
-                                        <div class="form-text">Final price charged to client</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="mt-3 pt-3 border-top">
-                                    <div class="row">
-                                        <div class="col-md-8 mb-3 mb-md-0">
-                                            <div class="form-text mb-2">
-                                                <strong>Profit Calculator:</strong> Sale Price - (Vendor Price + Expenses)
-                                            </div>
-                                            <div class="bg-white p-2 rounded border">
-                                                <span id="profitDisplay" class="fw-bold">$0.00</span>
-                                                <span id="marginDisplay" class="small text-muted ms-2">(0% margin)</span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 text-md-end">
-                                            <button type="button" id="calculateBtn" class="btn btn-outline-primary btn-sm">
-                                                <i class="fas fa-calculator me-1"></i> Calculate Profit
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                       <div class="card mb-4 border-0 bg-light">
+    <div class="card-body">
+        <h6 class="card-title text-primary mb-3">
+            <i class="fas fa-dollar-sign me-2"></i>Financial Details
+        </h6>
+
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label fw-medium">Quantity</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white">
+                        <i class="fas fa-sort-numeric-up"></i>
+                    </span>
+                    <input type="number" id="quantityInput" name="quantity" class="form-control" 
+                        value="{{ old('quantity', 1) }}" min="1" required>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-medium">Vendor Price (per item)</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white">Frw</span>
+                    <input type="number" step="0.01" id="vendorPriceInput" name="vendor_price" class="form-control" 
+                        value="{{ old('vendor_price') }}" required>
+                </div>
+                <div class="form-text">Paid per item to vendor</div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-medium">Additional Expenses</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white">Frw</span>
+                    <input type="number" step="0.01" id="expensesInput" name="expenses" class="form-control"
+                        value="{{ old('expenses', '0.00') }}">
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-medium">Sale Price (per item)</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white">Frw</span>
+                    <input type="number" step="0.01" id="salePriceInput" name="sale_price" class="form-control"
+                        value="{{ old('sale_price') }}" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <label class="form-label fw-medium">Comment</label>
+            <div class="input-group">
+                <span class="input-group-text bg-white">
+                    <i class="fas fa-comment"></i>
+                </span>
+                <textarea name="comment" class="form-control" rows="1"
+                    placeholder="Optional notes about this sale">{{ old('comment') }}</textarea>
+            </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-top">
+            <div class="form-text mb-2">
+                <strong>Totals & Profit:</strong> (Sale × Qty) - ((Vendor × Qty) + Expenses)
+            </div>
+            <div class="bg-white p-3 rounded border">
+                <div class="d-flex justify-content-between">
+                    <div>Total Vendor Cost: <strong id="totalVendor">Frw0</strong></div>
+                    <div>Total Sale: <strong id="totalSale">Frw0</strong></div>
+                </div>
+                <div class="mt-2">
+                    Profit: <strong id="profitDisplay">Frw0</strong>
+                    <span id="marginDisplay" class="small text-muted ms-2">(0% margin)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
                         
                         <div class="d-flex justify-content-between">
                             <a href="{{ route('sales.index') }}" class="btn btn-outline-secondary">
@@ -197,53 +214,54 @@ document.addEventListener('DOMContentLoaded', function() {
     let productSelectDiv = document.getElementById('productSelectDiv');
     let newProductDiv = document.getElementById('newProductDiv');
     let productSelect = document.getElementById('productSelect');
-    
-    // Calculate profit functionality
-    let calculateBtn = document.getElementById('calculateBtn');
-    let vendorPriceInput = document.querySelector('input[name="vendor_price"]');
-    let expensesInput = document.querySelector('input[name="expenses"]');
-    let salePriceInput = document.querySelector('input[name="sale_price"]');
-    let profitDisplay = document.getElementById('profitDisplay');
-    let marginDisplay = document.getElementById('marginDisplay');
-    
-    function calculateProfit() {
-        const vendorPrice = parseFloat(vendorPriceInput.value) || 0;
-        const expenses = parseFloat(expensesInput.value) || 0;
-        const salePrice = parseFloat(salePriceInput.value) || 0;
-        
-        const profit = salePrice - (vendorPrice + expenses);
-        const marginPercent = salePrice > 0 ? (profit / salePrice * 100).toFixed(1) : 0;
-        
-        profitDisplay.textContent = '$' + profit.toFixed(2);
-        marginDisplay.textContent = `(${marginPercent}% margin)`;
-        
-        if (profit > 0) {
-            profitDisplay.classList.remove('text-danger');
-            profitDisplay.classList.add('text-success');
-        } else {
-            profitDisplay.classList.remove('text-success');
-            profitDisplay.classList.add('text-danger');
-        }
-    }
-    
-    calculateBtn.addEventListener('click', calculateProfit);
-    
-    // Auto-calculate when any price field changes
-    vendorPriceInput.addEventListener('input', calculateProfit);
-    expensesInput.addEventListener('input', calculateProfit);
-    salePriceInput.addEventListener('input', calculateProfit);
 
-    // If an existing vendor is selected
+    // Financial inputs
+    const quantityInput = document.getElementById('quantityInput');
+    const vendorPriceInput = document.getElementById('vendorPriceInput');
+    const expensesInput = document.getElementById('expensesInput');
+    const salePriceInput = document.getElementById('salePriceInput');
+
+    const totalVendor = document.getElementById('totalVendor');
+    const totalSale = document.getElementById('totalSale');
+    const profitDisplay = document.getElementById('profitDisplay');
+    const marginDisplay = document.getElementById('marginDisplay');
+
+    function calculateProfit() {
+        const qty = parseFloat(quantityInput.value) || 0;
+        const vendorPrice = parseFloat(vendorPriceInput.value) || 0;
+        const salePrice = parseFloat(salePriceInput.value) || 0;
+        const expenses = parseFloat(expensesInput.value) || 0;
+
+        const totalVendorCost = vendorPrice * qty;
+        const totalSaleAmount = salePrice * qty;
+        const profit = totalSaleAmount - (totalVendorCost + expenses);
+        const marginPercent = totalSaleAmount > 0 ? (profit / totalSaleAmount * 100).toFixed(1) : 0;
+
+        totalVendor.textContent = 'Frw' + totalVendorCost.toFixed(2);
+        totalSale.textContent = 'Frw' + totalSaleAmount.toFixed(2);
+        profitDisplay.textContent = 'Frw' + profit.toFixed(2);
+        marginDisplay.textContent = `(${marginPercent}% margin)`;
+
+        profitDisplay.classList.toggle('text-success', profit > 0);
+        profitDisplay.classList.toggle('text-danger', profit <= 0);
+    }
+
+    [quantityInput, vendorPriceInput, expensesInput, salePriceInput].forEach(input => {
+        input.addEventListener('input', calculateProfit);
+    });
+
+    calculateProfit(); // initial call
+
+    // --- vendor/product dynamic load (unchanged from your code) ---
     vendorSelect.addEventListener('change', function() {
         if (this.value) {
-            newVendorInput.value = ''; // clear new vendor input
-            newProductDiv.classList.add('d-none'); // hide new product input
-            productSelectDiv.classList.remove('d-none'); // show product dropdown
-
-            productSelect.innerHTML = '<option value="">Loading...</option>';
+            newVendorInput.value = '';
+            newProductDiv.classList.add('d-none');
+            productSelectDiv.classList.remove('d-none');
+            productSelect.innerHTML = '<option>Loading...</option>';
 
             fetch(`/vendors/${this.value}/products`)
-                .then(response => response.json())
+                .then(res => res.json())
                 .then(data => {
                     productSelect.innerHTML = '<option value="">-- Select Product --</option>';
                     data.forEach(product => {
@@ -255,26 +273,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // If typing a new vendor, show new product input
     newVendorInput.addEventListener('input', function() {
         if (this.value.trim() !== '') {
-            vendorSelect.value = ""; // clear existing vendor selection
-            productSelectDiv.classList.add('d-none'); // hide product dropdown
-            newProductDiv.classList.remove('d-none'); // show new product input
+            vendorSelect.value = "";
+            productSelectDiv.classList.add('d-none');
+            newProductDiv.classList.remove('d-none');
         } else {
             productSelectDiv.classList.remove('d-none');
             newProductDiv.classList.add('d-none');
         }
     });
-    
-    // If the page loads with vendor data (e.g., form validation failed)
+
     if (vendorSelect.value) {
         fetch(`/vendors/${vendorSelect.value}/products`)
-            .then(response => response.json())
+            .then(r => r.json())
             .then(data => {
                 productSelect.innerHTML = '<option value="">-- Select Product --</option>';
                 const oldProductId = "{{ old('product_id') }}";
-                
                 data.forEach(product => {
                     const selected = product.id == oldProductId ? 'selected' : '';
                     productSelect.innerHTML += `<option value="${product.id}" ${selected}>${product.name}</option>`;
@@ -282,5 +297,32 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 });
+
+// Client autocomplete
+const clientNameInput = document.getElementById('clientNameInput');
+const clientPhoneInput = document.getElementById('clientPhoneInput');
+
+let debounceTimer;
+
+clientNameInput.addEventListener('input', function() {
+    clearTimeout(debounceTimer);
+    const term = this.value.trim();
+
+    if (term.length < 2) return; // wait for at least 2 chars
+
+    debounceTimer = setTimeout(() => {
+        fetch(`/clients/search?term=${encodeURIComponent(term)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.length > 0) {
+                    // pick the first matching client
+                    clientNameInput.value = data[0].client_name;
+                    clientPhoneInput.value = data[0].client_phone;
+                }
+            });
+    }, 300); // small debounce
+});
+
 </script>
+
 @endsection

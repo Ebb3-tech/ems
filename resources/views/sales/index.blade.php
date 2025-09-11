@@ -147,91 +147,81 @@
 
         <!-- Sales Table -->
         <div class="table-responsive">
-            <table class="table table-hover table-striped mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Client</th>
-                        <th>Product</th>
-                        <th>Vendor</th>
-                        <th>Vendor Price</th>
-                        <th>Expenses</th>
-                        <th>Sale Price</th>
-                        <th>Income</th>
-                        <th class="text-end">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="salesTableBody">
-                    @forelse($sales as $sale)
-                        <tr>
-                            <td>
-                                <div class="fw-medium">{{ $sale->client_name }}</div>
-                                <div class="small text-muted">{{ $sale->client_phone }}</div>
-                            </td>
-                            <td>{{ $sale->product->name }}</td>
-                            <td>{{ $sale->vendor->name ?? 'N/A' }}</td>
-                            <td>Frw{{ number_format($sale->vendor_price, 2) }}</td>
-                            <td>Frw{{ number_format($sale->expenses, 2) }}</td>
-                            <td class="fw-medium">Frw{{ number_format($sale->sale_price, 2) }}</td>
-                            <td class="fw-bold text-success">Frw{{ number_format($sale->income, 2) }}</td>
-                            <td class="text-end">
-                                <div class="btn-group">
-                                    <a href="{{ route('sales.edit', $sale) }}" class="btn btn-sm btn-outline-primary" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a href="{{ route('sales.show', $sale) }}" class="btn btn-sm btn-outline-info" title="View">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="text-center py-5">
-                                <div class="py-4">
-                                    <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
-                                    <h5>No sales recorded yet</h5>
-                                    <p class="text-muted mb-4">Get started by creating your first sale record</p>
-                                    <a href="{{ route('sales.create') }}" class="btn btn-primary">
-                                        <i class="fas fa-plus-circle me-2"></i>
-                                        Create New Sale
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+    <table class="table table-hover table-striped mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>Date</th>
+                <th>Client</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Vendor</th>
+                <th>Vendor Price</th>
+                <th>Expenses</th>
+                <th>Sale Price</th>
+                <th>Income</th>
+                <th>Comment</th> <!-- ✅ Fixed missing "<" -->
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="salesTableBody">
+            @forelse($sales as $sale)
+                <tr>
+                    <td>{{ $sale->created_at->format('Y-m-d') }}</td>
+                    <td>
+                        <div class="fw-medium">{{ $sale->client_name }}</div>
+                        <div class="small text-muted">{{ $sale->client_phone }}</div>
+                    </td>
+                    <td>{{ $sale->product->name }}</td>
+                    <td>{{ $sale->quantity }}</td>
+                    <td>{{ $sale->vendor->name ?? 'N/A' }}</td>
+                    <td>Frw{{ number_format($sale->vendor_price, 2) }}</td>
+                    <td>Frw{{ number_format($sale->expenses, 2) }}</td>
+                    <td class="fw-medium">Frw{{ number_format($sale->sale_price, 2) }}</td>
+                    <td class="fw-bold text-success">Frw{{ number_format($sale->income, 2) }}</td>
+                    <td>{{ $sale->comment }}</td>
+                    <td class="text-end">
+    <div class="btn-group">
+        <a href="{{ route('sales.edit', $sale) }}" class="btn btn-sm btn-outline-primary" title="Edit">
+            <i class="fas fa-edit"></i>
+        </a>
+        <a href="{{ route('sales.show', $sale) }}" class="btn btn-sm btn-outline-info" title="View">
+            <i class="fas fa-eye"></i>
+        </a>
+        <form action="{{ route('sales.destroy', $sale) }}" method="POST" style="display:inline-block;">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this sale?');">
+                <i class="fas fa-trash"></i>
+            </button>
+        </form>
+    </div>
+</td>
+
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="11" class="text-center py-5">
+                        <div class="py-4">
+                            <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                            <h5>No sales recorded yet</h5>
+                            <p class="text-muted mb-4">Get started by creating your first sale record</p>
+                            <a href="{{ route('sales.create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus-circle me-2"></i>
+                                Create New Sale
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+
         
-        <!-- Pagination -->
-        <div class="card-footer bg-white">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="small text-muted" id="resultsCount">
-                    Showing <span class="fw-medium">1</span> to <span class="fw-medium">{{ min(10, $sales->count()) }}</span> of <span class="fw-medium">{{ $sales->count() }}</span> results
-                </div>
-                <nav aria-label="Page navigation">
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
-                                <i class="fas fa-chevron-left"></i>
-                            </a>
-                        </li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
+
     </div>
 </div>
 
-<!-- Make sure Font Awesome is included -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <script>

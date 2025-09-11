@@ -13,7 +13,9 @@ class Sale extends Model
         'vendor_id',
         'vendor_price',
         'expenses',
-        'sale_price'
+        'sale_price',
+        'quantity',
+        'comment'
     ];
 
     public function product()
