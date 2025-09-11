@@ -17,7 +17,7 @@ class SaleController extends Controller
     // Only role 5 can access the overview
     if ($user->role != 5) {
         return redirect()->route('sales.create')
-            ->with('info', 'You can create sales, but the overview is only available to admins.');
+            ->with('info', 'You can create sales, but the overview is only available to ceo.');
     }
 
     $sales = Sale::with(['product', 'vendor'])->latest()->get();

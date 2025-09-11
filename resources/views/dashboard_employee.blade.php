@@ -287,6 +287,16 @@
                                 <small class="text-muted">Access the main dashboard</small>
                             </div>
                         </a>
+                       <a href="{{ route('sales.index') }}" class="btn btn-outline-success d-flex align-items-center justify-content-start py-3 text-start">
+    <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+        <i class="fas fa-cash-register fa-lg text-success"></i>
+    </div>
+    <div>
+        <div class="fw-semibold">Create Sales</div>
+        <small class="text-muted">View sales overview and manage records</small>
+    </div>
+</a>
+
                     </div>
                 </div>
             </div>

@@ -159,59 +159,68 @@
                         </tr>
                     </thead>
                     <tbody id="requests-table-body">
-                        @foreach($requests->sortByDesc('created_at') as $req)
-                        <tr>
-                            <td class="ps-3 fw-medium">{{ $req->customer->name }}</td>
-                            <td>{{ $req->customer->phone }}</td>
-                            <td>{{ $req->need }}</td>
-                            <td>{{ $req->created_at->format('Y-m-d H:i') }}</td>
-                            <td>
-                                <span class="badge bg-light text-dark">
-                                    @if($req->source == 'walk_in_customer')
-                                        <i class="fas fa-store me-1"></i> Walk-in
-                                    @elseif($req->source == 'phone')
-                                        <i class="fas fa-phone me-1"></i> Phone
-                                    @elseif($req->source == 'facebook')
-                                        <i class="fab fa-facebook me-1"></i> Facebook
-                                    @elseif($req->source == 'instagram')
-                                        <i class="fab fa-instagram me-1"></i> Instagram
-                                    @elseif($req->source == 'tiktok')
-                                        <i class="fab fa-tiktok me-1"></i> TikTok
-                                    @elseif($req->source == 'twitter')
-                                        <i class="fab fa-twitter me-1"></i> Twitter
-                                    @elseif($req->source == 'whatsapp')
-                                        <i class="fab fa-whatsapp me-1"></i> WhatsApp
-                                    @elseif($req->source == 'telegram')
-                                        <i class="fab fa-telegram me-1"></i> Telegram
-                                    @elseif($req->source == 'email')
-                                        <i class="fas fa-envelope me-1"></i> Email
-                                    @elseif($req->source == 'linkedin')
-                                        <i class="fab fa-linkedin me-1"></i> LinkedIn
-                                    @else
-                                        <i class="fas fa-globe me-1"></i> {{ ucfirst($req->source) }}
-                                    @endif
-                                </span>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <select class="form-select form-select-sm status-dropdown me-1" data-id="{{ $req->id }}">
-                                        @foreach(['pending','processing','completed','canceled'] as $status)
-                                            <option value="{{ $status }}" {{ $req->status==$status?'selected':'' }}>{{ ucfirst($status) }}</option>
-                                        @endforeach
-                                    </select>
-                                    <button class="btn btn-sm btn-primary update-status-btn" data-id="{{ $req->id }}">
-                                        <i class="fas fa-save"></i>
-                                    </button>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <a href="{{ route('customers.history', $req->customer->id) }}" class="btn btn-sm btn-outline-info rounded-circle" title="View details">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                            </td>
-                        </tr>
+    @if(in_array(auth()->user()->role, [2,5]))
+        @foreach($requests->sortByDesc('created_at') as $req)
+        <tr>
+            <td class="ps-3 fw-medium">{{ $req->customer->name }}</td>
+            <td>{{ $req->customer->phone }}</td>
+            <td>{{ $req->need }}</td>
+            <td>{{ $req->created_at->format('Y-m-d H:i') }}</td>
+            <td>
+                <span class="badge bg-light text-dark">
+                    @if($req->source == 'walk_in_customer')
+                        <i class="fas fa-store me-1"></i> Walk-in
+                    @elseif($req->source == 'phone')
+                        <i class="fas fa-phone me-1"></i> Phone
+                    @elseif($req->source == 'facebook')
+                        <i class="fab fa-facebook me-1"></i> Facebook
+                    @elseif($req->source == 'instagram')
+                        <i class="fab fa-instagram me-1"></i> Instagram
+                    @elseif($req->source == 'tiktok')
+                        <i class="fab fa-tiktok me-1"></i> TikTok
+                    @elseif($req->source == 'twitter')
+                        <i class="fab fa-twitter me-1"></i> Twitter
+                    @elseif($req->source == 'whatsapp')
+                        <i class="fab fa-whatsapp me-1"></i> WhatsApp
+                    @elseif($req->source == 'telegram')
+                        <i class="fab fa-telegram me-1"></i> Telegram
+                    @elseif($req->source == 'email')
+                        <i class="fas fa-envelope me-1"></i> Email
+                    @elseif($req->source == 'linkedin')
+                        <i class="fab fa-linkedin me-1"></i> LinkedIn
+                    @else
+                        <i class="fas fa-globe me-1"></i> {{ ucfirst($req->source) }}
+                    @endif
+                </span>
+            </td>
+            <td>
+                <div class="d-flex align-items-center">
+                    <select class="form-select form-select-sm status-dropdown me-1" data-id="{{ $req->id }}">
+                        @foreach(['pending','processing','completed','canceled'] as $status)
+                            <option value="{{ $status }}" {{ $req->status==$status?'selected':'' }}>{{ ucfirst($status) }}</option>
                         @endforeach
-                    </tbody>
+                    </select>
+                    <button class="btn btn-sm btn-primary update-status-btn" data-id="{{ $req->id }}">
+                        <i class="fas fa-save"></i>
+                    </button>
+                </div>
+            </td>
+            <td class="text-center">
+                <a href="{{ route('customers.history', $req->customer->id) }}" class="btn btn-sm btn-outline-info rounded-circle" title="View details">
+                    <i class="fas fa-eye"></i>
+                </a>
+            </td>
+        </tr>
+        @endforeach
+    @else
+        <tr>
+            <td colspan="7" class="text-center text-muted py-3">
+                Latest requests are hidden. Use the search to find requests.
+            </td>
+        </tr>
+    @endif
+</tbody>
+
                 </table>
             </div>
         </div>

@@ -11,17 +11,26 @@ use Illuminate\Http\Request;
 class CallCenterController extends Controller
 {
     public function index()
-    {
+{
+    $user = Auth::user();
+
+    // Get tasks assigned to the logged-in user
+    $tasks = Task::where('assigned_to', $user->id)
+                 ->latest()
+                 ->take(5)
+                 ->get();
+
+    // Only users with role 5 or 2 can see all requests
+    if (in_array($user->role, [2, 5])) {
         $requests = CustomerRequest::with('customer')->get();
-
-        // Get tasks assigned to the logged-in user
-        $tasks = Task::where('assigned_to', Auth::id())
-                     ->latest()
-                     ->take(5)
-                     ->get();
-
-        return view('callcenter.index', compact('requests', 'tasks'));
+    } else {
+        // Other users: empty collection initially
+        $requests = collect();
     }
+
+    return view('callcenter.index', compact('requests', 'tasks'));
+}
+
 
     public function myTasks()
     {
