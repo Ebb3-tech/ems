@@ -48,6 +48,11 @@
         <option value="linkedin">LinkedIn</option>
         <option value="twitter">Twitter(X)</option>
         <option value="snapchat">Snapchat</option>
+        <option value="whatsapp">WhatsApp</option>
+        <option value="telegram">Telegram</option>
+        <option value="phone">phone</option>
+        <option value="email">Email</option>
+        <option value="client">client</option>
         <option value="walk_in_customer">Walk-in Customer</option>
     </select>
 </div>

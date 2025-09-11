@@ -11,10 +11,20 @@ use App\Models\Customer;
 class SaleController extends Controller
 {
     public function index()
-    {
-        $sales = Sale::with(['product', 'vendor'])->latest()->get();
-        return view('sales.index', compact('sales'));
+{
+    $user = auth()->user();
+
+    // Only role 5 can access the overview
+    if ($user->role != 5) {
+        return redirect()->route('sales.create')
+            ->with('info', 'You can create sales, but the overview is only available to admins.');
     }
+
+    $sales = Sale::with(['product', 'vendor'])->latest()->get();
+
+    return view('sales.index', compact('sales'));
+}
+
 
     public function create()
     {

@@ -49,26 +49,29 @@ class AttendanceController extends Controller
 
     // Store a newly created attendance record in storage
     public function store(Request $request)
-    {
-        $request->validate([
-            'date' => 'required|date',
-            'status' => 'required|in:present,absent,late,leave',
-            'clock_in' => 'required_if:status,present,late|date_format:H:i',
-            'notes' => 'nullable|string',
-        ]);
+{
+    $request->validate([
+        'date' => 'required|date',
+        'status' => 'required|in:present,absent,late,leave',
+        'notes' => 'nullable|string',
+    ]);
 
-        Attendance::create([
-            'user_id' => auth()->id(),
-            'date' => $request->date,
-            'status' => $request->status,
-            'clock_in' => $request->clock_in,
-            'clock_out' => null, // Always null on creation (clock-in)
-            'notes' => $request->notes,
-        ]);
+    // Force clock_in to be the current server time
+    $currentTime = Carbon::now()->format('H:i');
 
-        return redirect()->route('attendance.index')
-            ->with('success', 'Clock-in recorded successfully! Remember to clock out when you finish work.');
-    }
+    Attendance::create([
+        'user_id' => auth()->id(),
+        'date' => $request->date,
+        'status' => $request->status,
+        'clock_in' => $currentTime,
+        'clock_out' => null,
+        'notes' => $request->notes,
+    ]);
+
+    return redirect()->route('attendance.index')
+        ->with('success', 'Clock-in recorded successfully! Remember to clock out when you finish work.');
+}
+
 
    public function edit(Attendance $attendance)
 {

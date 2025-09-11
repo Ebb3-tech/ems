@@ -8,6 +8,9 @@
             <a href="{{ route('callcenter.create') }}" class="btn btn-sm btn-primary me-2">
                 <i class="fas fa-plus-circle me-1"></i> New Customer
             </a>
+            <a href="{{ route('sales.index') }}" class="btn btn-sm btn-primary me-1 mb-1 mb-md-0">
+                <i class="fas fa-cash-register me-1"></i> Sales
+            </a>
             <a href="{{ route('attendance.create') }}" class="btn btn-sm btn-warning me-2">
                 <i class="fas fa-clock me-1"></i> Attendance
             </a>
